@@ -513,3 +513,337 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init charts for the default (dashboard) section
   setTimeout(() => { initCharts(); chartsInitialized = true; }, 100);
 });
+
+/* ─────────────────────────────────────────
+   AUTH & PROFILE SYSTEM
+───────────────────────────────────────── */
+
+// In-memory user store (simulates a DB for prototype)
+const USERS_DB = [
+  { mobile: '9876543210', aadhar: '1234 5678 9012', name: 'Deepan Kumar', ward: 'Ward 12 — Tambaram', age: 24 },
+  { mobile: '9123456789', aadhar: '9876 5432 1098', name: 'Priya Sundar',  ward: 'Ward 12 — Tambaram', age: 31 },
+];
+
+// Session state
+let currentUser = null;     // null = guest
+let currentStarRating = 0;
+let userFeedbacks = [];     // feedbacks submitted this session
+
+/* ── AUTH MODAL ── */
+function openAuth(tab = 'login') {
+  document.getElementById('auth-overlay').classList.add('show');
+  switchAuthTab(tab);
+}
+
+function closeAuth(e) {
+  if (e && e.target !== document.getElementById('auth-overlay')) return;
+  document.getElementById('auth-overlay').classList.remove('show');
+  clearAuthErrors();
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('auth-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  clearAuthErrors();
+}
+
+function clearAuthErrors() {
+  ['login-error','reg-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.textContent = ''; }
+  });
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+
+function formatAadhar(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 12);
+  input.value = v.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+}
+
+/* ── LOGIN ── */
+function handleLogin() {
+  const mobile = document.getElementById('login-mobile').value.replace(/\D/g, '');
+  const aadhar = document.getElementById('login-aadhar').value.trim();
+
+  if (!mobile || mobile.length < 10) { showAuthError('login-error', '⚠️ Enter a valid 10-digit mobile number.'); return; }
+  if (!aadhar || aadhar.replace(/\s/g,'').length < 12) { showAuthError('login-error', '⚠️ Enter a valid 12-digit Aadhaar number.'); return; }
+
+  const user = USERS_DB.find(u =>
+    u.mobile.replace(/\D/g,'') === mobile && u.aadhar.replace(/\s/g,'') === aadhar.replace(/\s/g,'')
+  );
+
+  if (!user) {
+    showAuthError('login-error', '❌ No account found. Check your details or register first.');
+    return;
+  }
+
+  loginSuccess(user);
+}
+
+/* ── REGISTER ── */
+function handleRegister() {
+  const name   = document.getElementById('reg-name').value.trim();
+  const mobile = document.getElementById('reg-mobile').value.replace(/\D/g, '');
+  const aadhar = document.getElementById('reg-aadhar').value.trim();
+  const ward   = document.getElementById('reg-ward').value;
+  const age    = document.getElementById('reg-age').value;
+
+  if (!name)                              { showAuthError('reg-error', '⚠️ Please enter your full name.'); return; }
+  if (!mobile || mobile.length < 10)     { showAuthError('reg-error', '⚠️ Enter a valid 10-digit mobile number.'); return; }
+  if (aadhar.replace(/\s/g,'').length < 12) { showAuthError('reg-error', '⚠️ Enter a valid 12-digit Aadhaar number.'); return; }
+  if (USERS_DB.find(u => u.mobile.replace(/\D/g,'') === mobile)) {
+    showAuthError('reg-error', '⚠️ This mobile number is already registered. Please login.'); return;
+  }
+
+  const newUser = { mobile, aadhar, name, ward, age: age || '—' };
+  USERS_DB.push(newUser);
+  loginSuccess(newUser);
+}
+
+function loginSuccess(user) {
+  currentUser = user;
+  document.getElementById('auth-overlay').classList.remove('show');
+  updateAvatarUI();
+  // Auto-fill complaint form if open
+  autoFillComplaintForm();
+  // Show toast
+  showToast(`Welcome, ${user.name.split(' ')[0]}! 👋`);
+}
+
+/* ── LOGOUT ── */
+function handleLogout() {
+  currentUser = null;
+  currentStarRating = 0;
+  userFeedbacks = [];
+  updateAvatarUI();
+  closeProfile();
+  showToast('Logged out successfully.');
+}
+
+/* ── AVATAR UI UPDATE ── */
+function updateAvatarUI() {
+  const btn   = document.getElementById('avatar-btn');
+  const label = document.getElementById('avatar-label');
+  if (currentUser) {
+    const initials = currentUser.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+    label.innerHTML = initials;
+    label.style.fontSize = '13px';
+    btn.classList.add('logged-in');
+    btn.title = currentUser.name;
+  } else {
+    label.innerHTML = '<i class="ti ti-user"></i>';
+    label.style.fontSize = '18px';
+    btn.classList.remove('logged-in');
+    btn.title = 'Profile / Login';
+  }
+}
+
+/* ── PROFILE PANEL ── */
+function openProfile() {
+  if (currentUser) {
+    renderProfilePanel();
+    document.getElementById('profile-loggedin').style.display = 'block';
+    document.getElementById('profile-guest').style.display    = 'none';
+  } else {
+    document.getElementById('profile-loggedin').style.display = 'none';
+    document.getElementById('profile-guest').style.display    = 'block';
+  }
+  document.getElementById('profile-overlay').classList.add('show');
+}
+
+function closeProfile(e) {
+  if (e && e.target !== document.getElementById('profile-overlay')) return;
+  document.getElementById('profile-overlay').classList.remove('show');
+}
+
+function renderProfilePanel() {
+  if (!currentUser) return;
+
+  // Avatar & name
+  const initials = currentUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('profile-avatar-big').textContent = initials;
+  document.getElementById('profile-name-display').textContent = currentUser.name;
+  document.getElementById('profile-meta-display').textContent = `${currentUser.ward} · Citizen`;
+
+  // Tickets belonging to this user (matched by name prefix or all new ones in session)
+  const myTickets = DATA.tickets.filter(t =>
+    t.submittedBy === currentUser.mobile || t.status === 'open' && DATA.tickets.indexOf(t) < 3
+  );
+  // Count stats
+  const myAll      = DATA.tickets.filter(t => t.submittedBy === currentUser.mobile);
+  const myResolved = myAll.filter(t => t.status === 'done');
+
+  document.getElementById('pstat-complaints').textContent = myAll.length;
+  document.getElementById('pstat-resolved').textContent   = myResolved.length;
+  document.getElementById('pstat-feedback').textContent   = userFeedbacks.length;
+
+  // My tickets list
+  const listEl = document.getElementById('profile-my-tickets');
+  if (myAll.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">No complaints submitted yet.<br>Your tickets will appear here after login.</div>';
+  } else {
+    listEl.innerHTML = myAll.slice(0,5).map(t => {
+      const statusLabel = { open:'Open', noted:'AI Noted', wip:'In Progress', done:'Resolved', invalid:'Cancelled' }[t.status] || t.status;
+      return `<div class="profile-ticket-item">
+        <div class="pt-header">
+          <div>
+            <div class="pt-id">${t.id}</div>
+            <div class="pt-title">${t.title}</div>
+          </div>
+          <span class="status-badge status-${t.status}" style="font-size:10px">${statusLabel}</span>
+        </div>
+        <div class="pt-date"><i class="ti ti-calendar" style="font-size:10px"></i> ${t.date} · ${t.cat}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Reset star
+  setStar(0);
+
+  // Feedback history
+  if (userFeedbacks.length > 0) {
+    document.getElementById('profile-feedbacks-section').style.display = 'block';
+    document.getElementById('profile-feedback-list').innerHTML = userFeedbacks.map(f => `
+      <div class="profile-feedback-item">
+        <div class="pf-stars">${'★'.repeat(f.stars)}${'☆'.repeat(5-f.stars)}</div>
+        <div class="pf-cat">${f.category}</div>
+        <div class="pf-text">${f.text}</div>
+        <div class="pf-date">${f.date}</div>
+      </div>`).join('');
+  } else {
+    document.getElementById('profile-feedbacks-section').style.display = 'none';
+  }
+}
+
+/* ── STAR RATING ── */
+function setStar(n) {
+  currentStarRating = n;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+}
+
+/* ── SUBMIT FEEDBACK ── */
+function submitFeedback() {
+  if (!currentUser) { showToast('Please login to submit feedback.'); return; }
+  if (currentStarRating === 0) {
+    document.getElementById('fb-status').style.display = 'block';
+    document.getElementById('fb-status').innerHTML = '<div style="font-size:12px;color:var(--amber)">⭐ Please select a star rating first.</div>';
+    return;
+  }
+
+  const category = document.getElementById('fb-category').value;
+  const text     = document.getElementById('fb-text').value.trim();
+
+  if (!category) {
+    document.getElementById('fb-status').style.display = 'block';
+    document.getElementById('fb-status').innerHTML = '<div style="font-size:12px;color:var(--amber)">⚠️ Please select a category.</div>';
+    return;
+  }
+  if (!text) {
+    document.getElementById('fb-status').style.display = 'block';
+    document.getElementById('fb-status').innerHTML = '<div style="font-size:12px;color:var(--amber)">⚠️ Please write your feedback.</div>';
+    return;
+  }
+
+  const fb = { stars: currentStarRating, category, text, date: todayStr(), user: currentUser.name };
+  userFeedbacks.unshift(fb);
+
+  // Also push into sentiment feed on the main app
+  const sentimentSection = document.querySelector('.feedback-list');
+  if (sentimentSection) {
+    const types = { 5:'positive', 4:'positive', 3:'neutral', 2:'negative', 1:'negative' };
+    const emojis = { 5:'😊', 4:'😊', 3:'😐', 2:'😤', 1:'😤' };
+    const colors = { 5:'green', 4:'green', 3:'amber', 2:'red', 1:'red' };
+    const div = document.createElement('div');
+    div.className = `feedback-item ${types[currentStarRating]}`;
+    div.innerHTML = `<div class="fb-header ${colors[currentStarRating]}">${emojis[currentStarRating]} ${types[currentStarRating].charAt(0).toUpperCase()+types[currentStarRating].slice(1)} · ${category} — ${currentUser.name}</div><div class="fb-text">"${text}"</div>`;
+    sentimentSection.prepend(div);
+  }
+
+  document.getElementById('fb-status').style.display = 'block';
+  document.getElementById('fb-status').innerHTML = `
+    <div style="padding:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:8px;font-size:12px">
+      <div style="color:#4ade80;font-weight:600">✅ Thank you, ${currentUser.name.split(' ')[0]}!</div>
+      <div style="color:var(--text2);margin-top:3px">Your feedback has been recorded and will help improve governance.</div>
+    </div>`;
+
+  // Reset form
+  document.getElementById('fb-text').value = '';
+  document.getElementById('fb-category').value = '';
+  setStar(0);
+
+  // Refresh panel stats
+  setTimeout(() => {
+    renderProfilePanel();
+    document.getElementById('fb-status').style.display = 'none';
+  }, 1800);
+}
+
+/* ── AUTO-FILL COMPLAINT FORM ── */
+function autoFillComplaintForm() {
+  if (!currentUser) return;
+  const nameEl  = document.getElementById('t-name');
+  const phoneEl = document.getElementById('t-phone');
+  const wardEl  = document.getElementById('t-ward');
+  if (nameEl  && !nameEl.value)  nameEl.value  = currentUser.name;
+  if (phoneEl && !phoneEl.value) phoneEl.value = currentUser.mobile;
+  if (wardEl) {
+    Array.from(wardEl.options).forEach(o => {
+      if (o.value === currentUser.ward) o.selected = true;
+    });
+  }
+}
+
+/* ── TAG TICKETS WITH USER ── */
+// Override submitTicket to tag the submitter
+const _origSubmitTicket = submitTicket;
+submitTicket = async function() {
+  // Tag new tickets with current user's mobile if logged in
+  if (currentUser) {
+    document.getElementById('t-name').value  = document.getElementById('t-name').value  || currentUser.name;
+    document.getElementById('t-phone').value = document.getElementById('t-phone').value || currentUser.mobile;
+  }
+  await _origSubmitTicket();
+  // After submission tag last ticket with user
+  if (currentUser && DATA.tickets.length > 0) {
+    DATA.tickets[0].submittedBy = currentUser.mobile;
+  }
+};
+
+/* ── TOAST ── */
+function showToast(msg) {
+  let toast = document.getElementById('app-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'app-toast';
+    toast.style.cssText = `
+      position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+      background:var(--card2);border:1px solid var(--border2);
+      color:var(--text);padding:10px 20px;border-radius:30px;
+      font-size:13px;font-family:'Space Grotesk',sans-serif;font-weight:500;
+      z-index:9999;opacity:0;transition:all .3s;pointer-events:none;
+      box-shadow:0 8px 32px rgba(0,0,0,.4);white-space:nowrap;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 3000);
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateAvatarUI();
+});

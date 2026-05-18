@@ -28,9 +28,174 @@
   <div class="header-right">
     <div class="ward-badge">Ward <span>12 — Tambaram</span></div>
     <div class="notif-btn"><i class="ti ti-bell"></i><span class="notif-dot"></span></div>
-    <div class="avatar-btn">RK</div>
+    <!-- Avatar: shows initials if logged in, person icon if not -->
+    <div class="avatar-btn" id="avatar-btn" onclick="openProfile()" title="Profile / Login">
+      <span id="avatar-label"><i class="ti ti-user"></i></span>
+    </div>
   </div>
 </header>
+
+<!-- ═══════════════════════════════════════
+     AUTH MODAL (Login / Register)
+════════════════════════════════════════ -->
+<div class="auth-overlay" id="auth-overlay" onclick="closeAuth(event)">
+  <div class="auth-modal" onclick="event.stopPropagation()">
+    <button class="auth-close" onclick="closeAuth()"><i class="ti ti-x"></i></button>
+
+    <!-- TAB SWITCHER -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="auth-login">
+      <div class="auth-header">
+        <div class="auth-icon">🔐</div>
+        <div class="auth-title">Welcome Back</div>
+        <div class="auth-sub">Login with your registered mobile & Aadhaar</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mobile Number *</label>
+        <input class="auth-input" type="tel" id="login-mobile" placeholder="+91 98765 43210" maxlength="13"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aadhaar Number *</label>
+        <input class="auth-input" type="text" id="login-aadhar" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="formatAadhar(this)"/>
+      </div>
+      <div id="login-error" class="auth-error" style="display:none"></div>
+      <button class="btn btn-primary auth-submit" onclick="handleLogin()"><i class="ti ti-login"></i> Login</button>
+      <div class="auth-note">Don't have an account? <span onclick="switchAuthTab('register')">Register here</span></div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="auth-register" style="display:none">
+      <div class="auth-header">
+        <div class="auth-icon">📋</div>
+        <div class="auth-title">Create Account</div>
+        <div class="auth-sub">Register as a citizen of NaalaatchiApp</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input class="auth-input" type="text" id="reg-name" placeholder="Enter your full name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mobile Number *</label>
+        <input class="auth-input" type="tel" id="reg-mobile" placeholder="+91 98765 43210" maxlength="13"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aadhaar Number *</label>
+        <input class="auth-input" type="text" id="reg-aadhar" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="formatAadhar(this)"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ward</label>
+          <select class="auth-input" id="reg-ward">
+            <option>Ward 12 — Tambaram</option>
+            <option>Ward 13 — Perungalathur</option>
+            <option>Ward 11 — Chromepet</option>
+            <option>Ward 14 — Pallavaram</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Age</label>
+          <input class="auth-input" type="number" id="reg-age" placeholder="e.g. 32" min="18" max="100"/>
+        </div>
+      </div>
+      <div id="reg-error" class="auth-error" style="display:none"></div>
+      <button class="btn btn-primary auth-submit" onclick="handleRegister()"><i class="ti ti-user-plus"></i> Create Account</button>
+      <div class="auth-note">Already have an account? <span onclick="switchAuthTab('login')">Login here</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PROFILE PANEL (slide-in from right)
+════════════════════════════════════════ -->
+<div class="profile-overlay" id="profile-overlay" onclick="closeProfile(event)">
+  <div class="profile-panel" onclick="event.stopPropagation()">
+    <button class="profile-close" onclick="closeProfile()"><i class="ti ti-x"></i></button>
+
+    <!-- LOGGED-IN VIEW -->
+    <div id="profile-loggedin" style="display:none">
+      <div class="profile-hero">
+        <div class="profile-avatar" id="profile-avatar-big">DK</div>
+        <div class="profile-name" id="profile-name-display">Citizen</div>
+        <div class="profile-meta" id="profile-meta-display">Ward 12 · Member</div>
+        <div class="profile-badge"><i class="ti ti-shield-check"></i> Aadhaar Verified</div>
+      </div>
+
+      <!-- MY STATS -->
+      <div class="profile-stats">
+        <div class="pstat"><div class="pstat-val" id="pstat-complaints">0</div><div class="pstat-label">Complaints</div></div>
+        <div class="pstat"><div class="pstat-val" id="pstat-resolved">0</div><div class="pstat-label">Resolved</div></div>
+        <div class="pstat"><div class="pstat-val" id="pstat-feedback">0</div><div class="pstat-label">Feedbacks</div></div>
+      </div>
+
+      <!-- MY COMPLAINTS -->
+      <div class="profile-section-title"><i class="ti ti-ticket"></i> My Complaints</div>
+      <div id="profile-my-tickets" class="profile-ticket-list"></div>
+
+      <!-- FEEDBACK FORM -->
+      <div class="profile-section-title" style="margin-top:18px"><i class="ti ti-message-circle"></i> Share Your Feedback</div>
+      <div class="profile-feedback-form">
+        <div class="star-rating" id="star-rating">
+          <span class="star" data-v="1" onclick="setStar(1)">★</span>
+          <span class="star" data-v="2" onclick="setStar(2)">★</span>
+          <span class="star" data-v="3" onclick="setStar(3)">★</span>
+          <span class="star" data-v="4" onclick="setStar(4)">★</span>
+          <span class="star" data-v="5" onclick="setStar(5)">★</span>
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label class="form-label">Category</label>
+          <select class="auth-input" id="fb-category">
+            <option value="">-- What's your feedback about? --</option>
+            <option>Water Supply</option>
+            <option>Road Repair</option>
+            <option>Waste Management</option>
+            <option>Street Lighting</option>
+            <option>Healthcare</option>
+            <option>Councillor Performance</option>
+            <option>App / Platform</option>
+            <option>General</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Feedback</label>
+          <textarea class="auth-input" id="fb-text" placeholder="Share your experience, suggestions, or concerns..." style="min-height:80px;resize:vertical"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitFeedback()" style="width:100%;justify-content:center"><i class="ti ti-send"></i> Submit Feedback</button>
+        <div id="fb-status" style="display:none;margin-top:10px"></div>
+      </div>
+
+      <!-- MY SUBMITTED FEEDBACKS -->
+      <div id="profile-feedbacks-section" style="display:none">
+        <div class="profile-section-title" style="margin-top:18px"><i class="ti ti-history"></i> My Feedback History</div>
+        <div id="profile-feedback-list"></div>
+      </div>
+
+      <button class="logout-btn" onclick="handleLogout()"><i class="ti ti-logout"></i> Logout</button>
+    </div>
+
+    <!-- GUEST VIEW -->
+    <div id="profile-guest">
+      <div class="profile-hero guest-hero">
+        <div class="profile-avatar guest-avatar"><i class="ti ti-user" style="font-size:28px"></i></div>
+        <div class="profile-name">You're not logged in</div>
+        <div class="profile-meta">Login to access your profile, track complaints and share feedback</div>
+      </div>
+      <div class="guest-features">
+        <div class="guest-feat"><i class="ti ti-ticket" style="color:var(--accent)"></i><span>Track your complaints</span></div>
+        <div class="guest-feat"><i class="ti ti-star" style="color:var(--amber)"></i><span>Rate governance & give feedback</span></div>
+        <div class="guest-feat"><i class="ti ti-shield-check" style="color:var(--green)"></i><span>Aadhaar-verified identity</span></div>
+        <div class="guest-feat"><i class="ti ti-bell" style="color:var(--purple)"></i><span>Get SMS updates on your tickets</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="closeProfile();openAuth('login')" style="width:100%;justify-content:center;margin-top:8px"><i class="ti ti-login"></i> Login</button>
+      <button class="btn btn-outline" onclick="closeProfile();openAuth('register')" style="width:100%;justify-content:center;margin-top:10px"><i class="ti ti-user-plus"></i> Register</button>
+      <div class="guest-note">You can still raise complaints without an account</div>
+    </div>
+  </div>
+</div>
 
 <div class="main">
 
