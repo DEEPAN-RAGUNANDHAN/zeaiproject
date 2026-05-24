@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ZEAI — Digital Governance Platform</title>
+<title>NaalaatchiApp — Digital Governance Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
@@ -11,12 +11,13 @@
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="header">
   <div class="logo">
-    <div class="logo-icon">💠</div>
+    <div class="logo-icon">⚖️</div>
     <div>
-      <div class="logo-text">ZEAI</div>
-      <div class="logo-sub">Smart City Operating System</div>
+      <div class="logo-text">NaalaatchiApp</div>
+      <div class="logo-sub">Digital Governance Platform</div>
     </div>
   </div>
   <nav class="header-nav">
@@ -25,28 +26,34 @@
     <button class="nav-btn" onclick="switchMain(this,'wards')">Wards</button>
   </nav>
   <div class="header-right">
-    <div class="ward-badge">Location <span>Mambakkam</span></div>
+    <div class="ward-badge">Ward <span>12 — Tambaram</span></div>
     <div class="notif-btn"><i class="ti ti-bell"></i><span class="notif-dot"></span></div>
+    <!-- Avatar: shows initials if logged in, person icon if not -->
     <div class="avatar-btn" id="avatar-btn" onclick="openProfile()" title="Profile / Login">
       <span id="avatar-label"><i class="ti ti-user"></i></span>
     </div>
   </div>
 </header>
 
-<div class="auth-overlay glass" id="auth-overlay" onclick="closeAuth(event)">
+<!-- ═══════════════════════════════════════
+     AUTH MODAL (Login / Register)
+════════════════════════════════════════ -->
+<div class="auth-overlay" id="auth-overlay" onclick="closeAuth(event)">
   <div class="auth-modal" onclick="event.stopPropagation()">
     <button class="auth-close" onclick="closeAuth()"><i class="ti ti-x"></i></button>
 
+    <!-- TAB SWITCHER -->
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
       <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
     </div>
 
+    <!-- LOGIN FORM -->
     <div id="auth-login">
       <div class="auth-header">
         <div class="auth-icon">🔐</div>
-        <div class="auth-title">Citizen Login</div>
-        <div class="auth-sub">Access your ZEAI Civic Dashboard</div>
+        <div class="auth-title">Welcome Back</div>
+        <div class="auth-sub">Login with your registered mobile & Aadhaar</div>
       </div>
       <div class="form-group">
         <label class="form-label">Mobile Number *</label>
@@ -57,14 +64,16 @@
         <input class="auth-input" type="text" id="login-aadhar" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="formatAadhar(this)"/>
       </div>
       <div id="login-error" class="auth-error" style="display:none"></div>
-      <button class="btn btn-primary auth-submit" onclick="handleLogin()"><i class="ti ti-login"></i> Authenticate</button>
-      <div class="auth-note">New citizen? <span onclick="switchAuthTab('register')">Initialize profile</span></div>
+      <button class="btn btn-primary auth-submit" onclick="handleLogin()"><i class="ti ti-login"></i> Login</button>
+      <div class="auth-note">Don't have an account? <span onclick="switchAuthTab('register')">Register here</span></div>
     </div>
 
+    <!-- REGISTER FORM -->
     <div id="auth-register" style="display:none">
       <div class="auth-header">
         <div class="auth-icon">📋</div>
-        <div class="auth-title">System Registration</div>
+        <div class="auth-title">Create Account</div>
+        <div class="auth-sub">Register as a citizen of NaalaatchiApp</div>
       </div>
       <div class="form-group">
         <label class="form-label">Full Name *</label>
@@ -80,12 +89,12 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Ward Node</label>
+          <label class="form-label">Ward</label>
           <select class="auth-input" id="reg-ward">
-            <option>Mambakkam</option>
-            <option>Tambaram</option>
-            <option>Perungalathur</option>
-            <option>Chromepet</option>
+            <option>Ward 12 — Tambaram</option>
+            <option>Ward 13 — Perungalathur</option>
+            <option>Ward 11 — Chromepet</option>
+            <option>Ward 14 — Pallavaram</option>
           </select>
         </div>
         <div class="form-group">
@@ -94,34 +103,41 @@
         </div>
       </div>
       <div id="reg-error" class="auth-error" style="display:none"></div>
-      <button class="btn btn-primary auth-submit" onclick="handleRegister()"><i class="ti ti-user-plus"></i> Initialize Account</button>
-      <div class="auth-note">Existing citizen? <span onclick="switchAuthTab('login')">Login here</span></div>
+      <button class="btn btn-primary auth-submit" onclick="handleRegister()"><i class="ti ti-user-plus"></i> Create Account</button>
+      <div class="auth-note">Already have an account? <span onclick="switchAuthTab('login')">Login here</span></div>
     </div>
   </div>
 </div>
 
-<div class="profile-overlay glass" id="profile-overlay" onclick="closeProfile(event)">
+<!-- ═══════════════════════════════════════
+     PROFILE PANEL (slide-in from right)
+════════════════════════════════════════ -->
+<div class="profile-overlay" id="profile-overlay" onclick="closeProfile(event)">
   <div class="profile-panel" onclick="event.stopPropagation()">
     <button class="profile-close" onclick="closeProfile()"><i class="ti ti-x"></i></button>
 
+    <!-- LOGGED-IN VIEW -->
     <div id="profile-loggedin" style="display:none">
       <div class="profile-hero">
         <div class="profile-avatar" id="profile-avatar-big">DK</div>
         <div class="profile-name" id="profile-name-display">Citizen</div>
-        <div class="profile-meta" id="profile-meta-display">Node 12 · Verified</div>
-        <div class="profile-badge"><i class="ti ti-shield-check"></i> Identity Secured</div>
+        <div class="profile-meta" id="profile-meta-display">Ward 12 · Member</div>
+        <div class="profile-badge"><i class="ti ti-shield-check"></i> Aadhaar Verified</div>
       </div>
 
+      <!-- MY STATS -->
       <div class="profile-stats">
-        <div class="pstat"><div class="pstat-val" id="pstat-complaints">0</div><div class="pstat-label">Reports</div></div>
+        <div class="pstat"><div class="pstat-val" id="pstat-complaints">0</div><div class="pstat-label">Complaints</div></div>
         <div class="pstat"><div class="pstat-val" id="pstat-resolved">0</div><div class="pstat-label">Resolved</div></div>
-        <div class="pstat"><div class="pstat-val" id="pstat-feedback">0</div><div class="pstat-label">Feedback</div></div>
+        <div class="pstat"><div class="pstat-val" id="pstat-feedback">0</div><div class="pstat-label">Feedbacks</div></div>
       </div>
 
-      <div class="profile-section-title"><i class="ti ti-ticket"></i> Active Reports</div>
+      <!-- MY COMPLAINTS -->
+      <div class="profile-section-title"><i class="ti ti-ticket"></i> My Complaints</div>
       <div id="profile-my-tickets" class="profile-ticket-list"></div>
 
-      <div class="profile-section-title" style="margin-top:18px"><i class="ti ti-message-circle"></i> Submit Telemetry</div>
+      <!-- FEEDBACK FORM -->
+      <div class="profile-section-title" style="margin-top:18px"><i class="ti ti-message-circle"></i> Share Your Feedback</div>
       <div class="profile-feedback-form">
         <div class="star-rating" id="star-rating">
           <span class="star" data-v="1" onclick="setStar(1)">★</span>
@@ -131,221 +147,374 @@
           <span class="star" data-v="5" onclick="setStar(5)">★</span>
         </div>
         <div class="form-group" style="margin-top:10px">
-          <label class="form-label">Sector</label>
+          <label class="form-label">Category</label>
           <select class="auth-input" id="fb-category">
-            <option value="">-- Target Sector --</option>
-            <option>Agri-Tech & Crop Health</option>
-            <option>Water Logistics</option>
-            <option>Grid Infrastructure</option>
-            <option>Sanitation Routing</option>
+            <option value="">-- What's your feedback about? --</option>
+            <option>Water Supply</option>
+            <option>Road Repair</option>
+            <option>Waste Management</option>
+            <option>Street Lighting</option>
+            <option>Healthcare</option>
+            <option>Councillor Performance</option>
+            <option>App / Platform</option>
+            <option>General</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Data Payload</label>
-          <textarea class="auth-input" id="fb-text" placeholder="Transmit local observations..."></textarea>
+          <label class="form-label">Your Feedback</label>
+          <textarea class="auth-input" id="fb-text" placeholder="Share your experience, suggestions, or concerns..." style="min-height:80px;resize:vertical"></textarea>
         </div>
-        <button class="btn btn-primary" onclick="submitFeedback()" style="width:100%;justify-content:center"><i class="ti ti-send"></i> Upload</button>
+        <button class="btn btn-primary" onclick="submitFeedback()" style="width:100%;justify-content:center"><i class="ti ti-send"></i> Submit Feedback</button>
         <div id="fb-status" style="display:none;margin-top:10px"></div>
       </div>
 
-      <button class="logout-btn" onclick="handleLogout()"><i class="ti ti-logout"></i> Terminate Session</button>
+      <!-- MY SUBMITTED FEEDBACKS -->
+      <div id="profile-feedbacks-section" style="display:none">
+        <div class="profile-section-title" style="margin-top:18px"><i class="ti ti-history"></i> My Feedback History</div>
+        <div id="profile-feedback-list"></div>
+      </div>
+
+      <button class="logout-btn" onclick="handleLogout()"><i class="ti ti-logout"></i> Logout</button>
     </div>
 
+    <!-- GUEST VIEW -->
     <div id="profile-guest">
       <div class="profile-hero guest-hero">
         <div class="profile-avatar guest-avatar"><i class="ti ti-user" style="font-size:28px"></i></div>
-        <div class="profile-name">Unidentified User</div>
-        <div class="profile-meta">Authenticate to access ZEAI network</div>
+        <div class="profile-name">You're not logged in</div>
+        <div class="profile-meta">Login to access your profile, track complaints and share feedback</div>
+      </div>
+      <div class="guest-features">
+        <div class="guest-feat"><i class="ti ti-ticket" style="color:var(--accent)"></i><span>Track your complaints</span></div>
+        <div class="guest-feat"><i class="ti ti-star" style="color:var(--amber)"></i><span>Rate governance & give feedback</span></div>
+        <div class="guest-feat"><i class="ti ti-shield-check" style="color:var(--green)"></i><span>Aadhaar-verified identity</span></div>
+        <div class="guest-feat"><i class="ti ti-bell" style="color:var(--purple)"></i><span>Get SMS updates on your tickets</span></div>
       </div>
       <button class="btn btn-primary" onclick="closeProfile();openAuth('login')" style="width:100%;justify-content:center;margin-top:8px"><i class="ti ti-login"></i> Login</button>
+      <button class="btn btn-outline" onclick="closeProfile();openAuth('register')" style="width:100%;justify-content:center;margin-top:10px"><i class="ti ti-user-plus"></i> Register</button>
+      <div class="guest-note">You can still raise complaints without an account</div>
     </div>
   </div>
 </div>
 
 <div class="main">
+
+  <!-- SECTION TABS -->
   <div class="section-tabs">
-    <button class="stab active" onclick="switchSection(this,'dashboard')"><i class="ti ti-layout-dashboard"></i> Central Hub</button>
-    <button class="stab" onclick="switchSection(this,'ai-analytics')"><i class="ti ti-cpu"></i> AI Predictive</button>
-    <button class="stab" onclick="switchSection(this,'projects')"><i class="ti ti-timeline"></i> Infrastructure</button>
-    <button class="stab" onclick="switchSection(this,'tickets')"><i class="ti ti-ticket"></i> Civic Reports</button>
-    <button class="stab" onclick="switchSection(this,'performance')"><i class="ti ti-chart-bar"></i> Metrics</button>
+    <button class="stab active" onclick="switchSection(this,'dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="stab" onclick="switchSection(this,'promises')"><i class="ti ti-target"></i> Promise Tracker</button>
+    <button class="stab" onclick="switchSection(this,'projects')"><i class="ti ti-timeline"></i> Projects</button>
+    <button class="stab" onclick="switchSection(this,'sentiment')"><i class="ti ti-mood-happy"></i> Sentiment</button>
+    <button class="stab" onclick="switchSection(this,'tickets')"><i class="ti ti-ticket"></i> Complaints</button>
+    <button class="stab" onclick="switchSection(this,'performance')"><i class="ti ti-chart-bar"></i> Performance</button>
   </div>
 
-  <div class="section active fade-in" id="sec-dashboard">
+  <!-- ===== DASHBOARD ===== -->
+  <div class="section active" id="sec-dashboard">
+
     <div class="stat-grid">
-      <div class="stat-card glass-card">
-        <div class="stat-label">System Uptime</div>
-        <div class="stat-value cyan">99.9%</div>
-        <div class="stat-sub">Tamil Nadu Grid</div>
-        <div class="stat-change change-up"><i class="ti ti-check"></i> Optimal</div>
+      <div class="stat-card">
+        <div class="stat-label">Promises Made</div>
+        <div class="stat-value accent">48</div>
+        <div class="stat-sub">By Councillor Ravi Kumar</div>
+        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> 6 new this month</div>
       </div>
-      <div class="stat-card glass-card">
-        <div class="stat-label">Resolved Issues</div>
-        <div class="stat-value blue">1,402</div>
-        <div class="stat-sub">Current Quarter</div>
-        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> +12% Efficiency</div>
+      <div class="stat-card">
+        <div class="stat-label">Delivered</div>
+        <div class="stat-value green">31</div>
+        <div class="stat-sub">64.6% delivery rate</div>
+        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> Up from 58% last qtr</div>
       </div>
-      <div class="stat-card glass-card">
-        <div class="stat-label">Active Anomalies</div>
-        <div class="stat-value cyan">127</div>
-        <div class="stat-sub">Awaiting resolution</div>
-        <div class="stat-change change-dn"><i class="ti ti-arrow-down"></i> 14 cleared today</div>
+      <div class="stat-card">
+        <div class="stat-label">Active Complaints</div>
+        <div class="stat-value amber">127</div>
+        <div class="stat-sub">Across 18 wards</div>
+        <div class="stat-change change-dn"><i class="ti ti-arrow-down"></i> 14 resolved today</div>
       </div>
-      <div class="stat-card glass-card">
-        <div class="stat-label">Public Sentiment</div>
-        <div class="stat-value blue">88%</div>
-        <div class="stat-sub">AI Evaluated</div>
-        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> +3%</div>
+      <div class="stat-card">
+        <div class="stat-label">Public Satisfaction</div>
+        <div class="stat-value purple">72%</div>
+        <div class="stat-sub">Based on 4,812 responses</div>
+        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> +3% this week</div>
       </div>
     </div>
 
     <div class="two-col">
-      <div class="card glass-card">
-        <div class="card-title">Dynamic Resource Allocation <span class="card-badge">Live</span></div>
-        <div class="chart-wrap" style="height:200px">
-          <canvas id="budgetChart"></canvas>
+      <div class="card">
+        <div class="card-title">Promise vs Delivery <span class="card-badge">Live</span></div>
+        <div class="donut-flex">
+          <div class="chart-wrap" style="height:170px;max-width:170px;flex-shrink:0">
+            <canvas id="donutChart" role="img" aria-label="Promise delivery chart: 64.6% delivered, 22.9% in progress, 12.5% delayed">64.6% delivered, 22.9% in progress, 12.5% delayed</canvas>
+          </div>
+          <div class="donut-legend">
+            <div class="legend-row"><span class="leg-dot" style="background:#22C55E"></span><span class="leg-label">Delivered</span><span class="leg-val green">31 (64.6%)</span></div>
+            <div class="legend-row"><span class="leg-dot" style="background:#F59E0B"></span><span class="leg-label">In Progress</span><span class="leg-val amber">11 (22.9%)</span></div>
+            <div class="legend-row"><span class="leg-dot" style="background:#EF4444"></span><span class="leg-label">Delayed</span><span class="leg-val red">6 (12.5%)</span></div>
+            <div class="delivery-rate-box">
+              <div class="dr-label">Delivery Rate vs Target</div>
+              <div class="dr-value green">64.6% <span class="dr-target">/ 75% target</span></div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card glass-card">
-        <div class="card-title">Anomaly Detection (30 Days)</div>
-        <div class="chart-wrap" style="height:200px">
-          <canvas id="trendChart"></canvas>
+      <div class="card">
+        <div class="card-title">Complaint Trend (30 days) <span class="card-badge">Updated hourly</span></div>
+        <div class="chart-wrap" style="height:170px">
+          <canvas id="trendChart" role="img" aria-label="Complaints raised and resolved over 30 days">Weekly trend</canvas>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="section fade-in" id="sec-ai-analytics">
+    <div class="card full-col">
+      <div class="card-title">Top Issues This Week <i class="ti ti-trending-up" style="color:var(--text3);font-size:16px"></i></div>
+      <div class="issue-chips">
+        <span class="issue-tag"><i class="ti ti-droplet" style="color:var(--accent)"></i> Water Supply <span class="issue-count">43</span></span>
+        <span class="issue-tag"><i class="ti ti-road" style="color:var(--amber)"></i> Road Repair <span class="issue-count">38</span></span>
+        <span class="issue-tag"><i class="ti ti-trash" style="color:var(--red)"></i> Waste Mgmt <span class="issue-count">29</span></span>
+        <span class="issue-tag"><i class="ti ti-bulb" style="color:var(--amber)"></i> Street Lights <span class="issue-count">22</span></span>
+        <span class="issue-tag"><i class="ti ti-building-hospital" style="color:var(--green)"></i> Healthcare <span class="issue-count">17</span></span>
+        <span class="issue-tag"><i class="ti ti-school" style="color:var(--purple)"></i> Education <span class="issue-count">14</span></span>
+        <span class="issue-tag"><i class="ti ti-tree" style="color:var(--teal)"></i> Parks <span class="issue-count">9</span></span>
+        <span class="issue-tag"><i class="ti ti-wifi" style="color:var(--accent)"></i> Connectivity <span class="issue-count">7</span></span>
+      </div>
+    </div>
+
     <div class="two-col">
-      <div class="card glass-card">
-        <div class="card-title">Drone Telemetry & Crop Health <span class="card-badge live-badge">● YOLOv8 ACTIVE</span></div>
+      <div class="card">
+        <div class="card-title">Budget Utilization <i class="ti ti-coin" style="color:var(--text3);font-size:16px"></i></div>
+        <div class="budget-summary">
+          <div class="budget-row"><span>Total Sanctioned</span><span class="fw6">₹18.4 Cr</span></div>
+          <div class="budget-row"><span>Utilized</span><span class="fw6 green">₹11.8 Cr (64%)</span></div>
+          <div class="budget-row"><span>Pending Release</span><span class="fw6 amber">₹6.6 Cr</span></div>
+        </div>
+        <div class="chart-wrap" style="height:160px;margin-top:12px">
+          <canvas id="budgetChart" role="img" aria-label="Budget utilization by category">Budget by infrastructure, welfare, education, health, sanitation</canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Govt. Update Feed <i class="ti ti-bell" style="color:var(--text3);font-size:16px"></i></div>
         <div class="feed-list">
-          <div class="feed-item"><span class="feed-icon cyan-icon">🛰️</span><div><div class="feed-title">UAV Scan Completed: Mambakkam Sector 4</div><div class="feed-time">10 mins ago · ROS 2 Node 04</div></div></div>
-          <div class="feed-item"><span class="feed-icon amber-icon">⚠️</span><div><div class="feed-title">YOLOv8 Alert: 14% Blight Detection Risk</div><div class="feed-time">12 mins ago · Agri-Tech Module</div></div></div>
-          <div class="feed-item"><span class="feed-icon blue-icon">💧</span><div><div class="feed-title">Automated Pesticide Drone Dispatched</div><div class="feed-time">Just now · Trajectory locked</div></div></div>
-        </div>
-        <div class="chart-wrap" style="height:180px; margin-top: 15px;">
-           <canvas id="radarChart"></canvas>
+          <div class="feed-item"><span class="feed-icon green-icon">✓</span><div><div class="feed-title">Tender awarded for water pipeline</div><div class="feed-time">2 hrs ago · Ward 12</div></div></div>
+          <div class="feed-item"><span class="feed-icon blue-icon">📋</span><div><div class="feed-title">Site inspection completed — Road Section B</div><div class="feed-time">Yesterday · Ward 12</div></div></div>
+          <div class="feed-item"><span class="feed-icon amber-icon">⚠️</span><div><div class="feed-title">Park project — delayed due to land dispute</div><div class="feed-time">3 days ago · Ward 12</div></div></div>
+          <div class="feed-item"><span class="feed-icon green-icon">🏆</span><div><div class="feed-title">₹85L released for pipeline — Finance dept</div><div class="feed-time">5 days ago · District</div></div></div>
         </div>
       </div>
-      <div class="card glass-card">
-        <div class="card-title">Urban Flood Forecasting</div>
-        <div id="heat-rows"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== PROMISE TRACKER ===== -->
+  <div class="section" id="sec-promises">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Promise vs Delivery Tracker</div>
+        <div id="promise-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Category Breakdown</div>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="promiseCatChart" role="img" aria-label="Promise fulfillment by category">Promise categories chart</canvas>
+        </div>
+        <div class="card-title" style="margin-top:16px">Timeline Adherence</div>
+        <div class="chart-wrap" style="height:160px">
+          <canvas id="timelineChart" role="img" aria-label="Promise delivery timeline adherence">Timeline chart</canvas>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="section fade-in" id="sec-projects">
+  <!-- ===== PROJECTS ===== -->
+  <div class="section" id="sec-projects">
     <div class="two-col">
-      <div class="card glass-card">
-        <div class="card-title">Infrastructure Pipeline <span class="card-badge live-badge">● LIVE</span></div>
-        <div class="timeline" id="timeline-view"></div>
+      <div class="card">
+        <div class="card-title">Real-time Project Timeline <span class="card-badge live-badge">● LIVE</span></div>
+        <div class="timeline" id="timeline-view">
+          <!-- Populated by JS -->
+        </div>
       </div>
       <div>
-        <div class="card glass-card" style="margin-bottom:14px">
-          <div class="card-title">Active Nodes</div>
-          <div id="project-list"></div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-title">Active Projects</div>
+          <div id="project-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent Govt. Updates</div>
+          <div class="feed-list">
+            <div class="feed-item"><span class="feed-icon green-icon">✓</span><div><div class="feed-title">Tender awarded for water pipeline</div><div class="feed-time">2 hrs ago · Ward 12</div></div></div>
+            <div class="feed-item"><span class="feed-icon blue-icon">📋</span><div><div class="feed-title">Road Section B inspection complete</div><div class="feed-time">Yesterday · Ward 12</div></div></div>
+            <div class="feed-item"><span class="feed-icon amber-icon">⚠️</span><div><div class="feed-title">Park project delayed — land dispute</div><div class="feed-time">3 days ago</div></div></div>
+            <div class="feed-item"><span class="feed-icon green-icon">💰</span><div><div class="feed-title">₹85L funds released for pipeline</div><div class="feed-time">5 days ago · Finance Dept</div></div></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="section fade-in" id="sec-tickets">
+  <!-- ===== SENTIMENT ===== -->
+  <div class="section" id="sec-sentiment">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Positive</div><div class="stat-value green">48%</div><div class="stat-sub">Satisfied citizens</div></div>
+      <div class="stat-card"><div class="stat-label">Neutral</div><div class="stat-value amber">24%</div><div class="stat-sub">Moderate response</div></div>
+      <div class="stat-card"><div class="stat-label">Negative</div><div class="stat-value red">28%</div><div class="stat-sub">Dissatisfied citizens</div></div>
+      <div class="stat-card"><div class="stat-label">Total Voices</div><div class="stat-value accent">4,812</div><div class="stat-sub">Responses collected</div></div>
+    </div>
     <div class="two-col">
-      <div class="card glass-card ticket-form">
-        <div class="card-title">Transmit Civic Report <i class="ti ti-plus" style="color:var(--accent2);font-size:16px"></i></div>
+      <div class="card">
+        <div class="card-title">Sentiment Distribution</div>
+        <div class="sentiment-bar">
+          <div class="sent-seg" style="flex:48;background:#16A34A">48%</div>
+          <div class="sent-seg" style="flex:24;background:#D97706">24%</div>
+          <div class="sent-seg" style="flex:28;background:#DC2626">28%</div>
+        </div>
+        <div class="sent-legend">
+          <span><span style="color:var(--green)">●</span> Positive</span>
+          <span><span style="color:var(--amber)">●</span> Neutral</span>
+          <span><span style="color:var(--red)">●</span> Negative</span>
+        </div>
+        <div class="chart-wrap" style="height:200px;margin-top:12px">
+          <canvas id="sentChart" role="img" aria-label="Sentiment trend over 8 weeks">Weekly sentiment trend</canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Issue Heatmap by Category</div>
+        <div id="heat-rows"></div>
+        <div class="card-title" style="margin-top:16px;font-size:13px">Recent Public Feedback</div>
+        <div class="feedback-list">
+          <div class="feedback-item positive">
+            <div class="fb-header green">😊 Positive · Water Board</div>
+            <div class="fb-text">"Water supply improved significantly in last 2 weeks. Thank you!"</div>
+          </div>
+          <div class="feedback-item negative">
+            <div class="fb-header red">😤 Negative · Roads</div>
+            <div class="fb-text">"Pothole near Bus stand still not fixed. Very dangerous at night."</div>
+          </div>
+          <div class="feedback-item neutral">
+            <div class="fb-header amber">😐 Neutral · Sanitation</div>
+            <div class="fb-text">"Garbage pickup is inconsistent. Needs a fixed schedule."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMPLAINTS / TICKETS ===== -->
+  <div class="section" id="sec-tickets">
+    <div class="two-col">
+
+      <!-- RAISE TICKET -->
+      <div class="card ticket-form">
+        <div class="card-title">Raise a Complaint <i class="ti ti-plus" style="color:var(--accent);font-size:16px"></i></div>
         <div class="form-group">
-          <label class="form-label">Citizen Identity *</label>
-          <input type="text" id="t-name" placeholder="Name or Alias"/>
+          <label class="form-label">Your Name *</label>
+          <input type="text" id="t-name" placeholder="Enter your full name"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Contact Relay *</label>
-          <input type="tel" id="t-phone" placeholder="+91 XXXX XXXXX"/>
+          <label class="form-label">Mobile Number *</label>
+          <input type="tel" id="t-phone" placeholder="+91 98765 43210"/>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Zone *</label>
+            <label class="form-label">Ward *</label>
             <select id="t-ward">
-              <option>Mambakkam</option>
-              <option>Tambaram</option>
+              <option>Ward 12 — Tambaram</option>
+              <option>Ward 13 — Perungalathur</option>
+              <option>Ward 11 — Chromepet</option>
+              <option>Ward 14 — Pallavaram</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Classification *</label>
+            <label class="form-label">Category *</label>
             <select id="t-cat">
-              <option value="">-- Detect --</option>
-              <option>Grid / Power</option>
-              <option>Water / Logistics</option>
-              <option>Agri-Tech / Land</option>
-              <option>Infrastructure</option>
+              <option value="">-- Select --</option>
+              <option>Water Supply</option>
+              <option>Road / Pothole</option>
+              <option>Waste Management</option>
+              <option>Street Lighting</option>
+              <option>Drainage / Sewage</option>
+              <option>Parks & Greenery</option>
+              <option>Healthcare</option>
+              <option>Other</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Subject *</label>
-          <input type="text" id="t-title" placeholder="Define the anomaly..."/>
+          <label class="form-label">Complaint Title *</label>
+          <input type="text" id="t-title" placeholder="Brief title of your issue"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Telemetry Data *</label>
-          <textarea id="t-desc" placeholder="Provide coordinates, duration, and visual descriptors..."></textarea>
+          <label class="form-label">Description *</label>
+          <textarea id="t-desc" placeholder="Describe your issue in detail. Include location, duration, and impact on residents..."></textarea>
         </div>
-        <button class="btn btn-primary" onclick="submitTicket()"><i class="ti ti-send"></i> Initialize Report</button>
+        <div class="form-group">
+          <label class="form-label">Location / Landmark</label>
+          <input type="text" id="t-loc" placeholder="Near Tambaram Bus Stand, Street 4..."/>
+        </div>
+        <button class="btn btn-primary" onclick="submitTicket()"><i class="ti ti-send"></i> Submit Complaint</button>
         <div id="ai-status" style="display:none;margin-top:12px"></div>
       </div>
 
+      <!-- EXISTING TICKETS -->
       <div>
         <div class="ticket-filter-bar">
-          <button class="filter-btn active" onclick="filterTickets(this,'all')">System Wide</button>
-          <button class="filter-btn" onclick="filterTickets(this,'open')">Pending</button>
-          <button class="filter-btn" onclick="filterTickets(this,'wip')">Processing</button>
+          <button class="filter-btn active" onclick="filterTickets(this,'all')">All</button>
+          <button class="filter-btn" onclick="filterTickets(this,'open')">Open</button>
+          <button class="filter-btn" onclick="filterTickets(this,'wip')">In Progress</button>
           <button class="filter-btn" onclick="filterTickets(this,'done')">Resolved</button>
+          <button class="filter-btn" onclick="filterTickets(this,'invalid')">Cancelled</button>
         </div>
-        <div id="ticket-list"></div>
+        <div id="ticket-list">
+          <!-- Populated by JS -->
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="section fade-in" id="sec-performance">
-    <div class="card glass-card">
-      <div class="card-title">Node Efficiency Matrix</div>
-      <table class="perf-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Officer Identity</th>
-            <th>Zone</th>
-            <th>ZEAI Score</th>
-            <th>Throughput</th>
-            <th>Vector</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard-body"></tbody>
-      </table>
+  <!-- ===== PERFORMANCE ===== -->
+  <div class="section" id="sec-performance">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Overall Score</div><div class="stat-value green">78/100</div><div class="stat-sub">Ward 12 ranking: #3/18</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Resolution Time</div><div class="stat-value accent">4.2 days</div><div class="stat-sub">District avg: 6.8 days</div></div>
+      <div class="stat-card"><div class="stat-label">Response Rate</div><div class="stat-value green">91%</div><div class="stat-sub">Complaints acknowledged</div></div>
+      <div class="stat-card"><div class="stat-label">Citizen Rating</div><div class="stat-value amber">3.8★</div><div class="stat-sub">Out of 5 · 2,341 ratings</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Councillor Leaderboard <i class="ti ti-trophy" style="color:var(--amber);font-size:16px"></i></div>
+        <table class="perf-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Councillor</th>
+              <th>Ward</th>
+              <th>Score</th>
+              <th>Delivery</th>
+              <th>Trend</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Performance Radar</div>
+        <div class="chart-wrap" style="height:280px">
+          <canvas id="radarChart" role="img" aria-label="Performance radar chart across 6 dimensions">Performance dimensions</canvas>
+        </div>
+      </div>
     </div>
   </div>
+
 </div>
 
-<div class="ai-fab" onclick="toggleAIChat()">
-  <i class="ti ti-robot"></i>
-</div>
-<div class="ai-chat-panel glass-card" id="ai-chat-panel">
-  <div class="ai-chat-header">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <div class="pulse-dot"></div> ZEAI Engine
-    </div>
-    <button onclick="toggleAIChat()"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="ai-chat-body" id="ai-chat-body">
-    <div class="ai-msg bot">System initialized. I am your ZEAI Civic Assistant. I can process reports, predict urgency, or analyze drone telemetry. How can I assist you?</div>
-  </div>
-  <div class="ai-chat-input">
-    <input type="text" id="ai-chat-input-field" placeholder="Query system (Tamil/Eng)..." onkeypress="if(event.key === 'Enter') sendAIMsg()">
-    <button onclick="sendAIMsg()"><i class="ti ti-send"></i></button>
-  </div>
-</div>
-
-<div class="modal-overlay glass" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal glass-card" onclick="event.stopPropagation()">
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('show')"><i class="ti ti-x"></i></button>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-sub" id="modal-sub"></div>
