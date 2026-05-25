@@ -11,6 +11,25 @@
 </head>
 <body>
 
+<!-- PARTICLE BG -->
+<div id="na-particles" aria-hidden="true"></div>
+<div class="na-grid-bg" aria-hidden="true"></div>
+<div class="na-scan-line" aria-hidden="true"></div>
+
+<!-- LIVE ALERT TICKER -->
+<div class="na-alert-banner" role="marquee" aria-label="Live civic alerts">
+  <i class="ti ti-broadcast" style="color:var(--accent);flex-shrink:0;font-size:14px"></i>
+  <div class="na-alert-scroll">
+    <div class="na-alert-inner" id="na-alert-text">
+      ✅ Ward 14 water pipeline repair completed — service restored &nbsp;&nbsp;|&nbsp;&nbsp;
+      ⚠️ Garbage overflow alert: Tambaram sector — crew dispatched &nbsp;&nbsp;|&nbsp;&nbsp;
+      🤖 AI triaged 127 complaints today — 91% routed in under 5 minutes &nbsp;&nbsp;|&nbsp;&nbsp;
+      🏆 Ward 12 resolution rate up 18% this week
+    </div>
+  </div>
+  <div id="na-live-clock" class="na-clock" aria-label="Current time"></div>
+</div>
+
 <!-- HEADER -->
 <header class="header">
   <div class="logo">
@@ -302,6 +321,73 @@
       </div>
     </div>
 
+    <!-- AI PREDICTIVE INTELLIGENCE — NEW -->
+    <div class="card full-col na-predict-section">
+      <div class="card-title">
+        <i class="ti ti-brain" style="color:var(--purple);font-size:16px"></i>
+        AI Predictive Intelligence
+        <span class="card-badge" style="background:rgba(168,85,247,.15);color:var(--purple);border-color:rgba(168,85,247,.3)">Live Model</span>
+      </div>
+      <div class="na-predict-grid">
+        <div class="na-predict-card na-predict-flood">
+          <div class="na-predict-icon"><i class="ti ti-droplet"></i></div>
+          <div class="na-predict-label">Flood Risk</div>
+          <div class="na-predict-val" style="color:var(--red)">78%</div>
+          <div class="na-predict-risk na-risk-high">HIGH · N. Chennai</div>
+        </div>
+        <div class="na-predict-card na-predict-waste">
+          <div class="na-predict-icon"><i class="ti ti-trash"></i></div>
+          <div class="na-predict-label">Garbage Overflow</div>
+          <div class="na-predict-val" style="color:var(--amber)">89%</div>
+          <div class="na-predict-risk na-risk-high">CRITICAL · Tambaram</div>
+        </div>
+        <div class="na-predict-card na-predict-water">
+          <div class="na-predict-icon"><i class="ti ti-droplet-half2"></i></div>
+          <div class="na-predict-label">Water Shortage</div>
+          <div class="na-predict-val" style="color:var(--green)">34%</div>
+          <div class="na-predict-risk na-risk-low">LOW · South Chennai</div>
+        </div>
+        <div class="na-predict-card na-predict-disease">
+          <div class="na-predict-icon"><i class="ti ti-virus"></i></div>
+          <div class="na-predict-label">Disease Hotspot</div>
+          <div class="na-predict-val" style="color:var(--amber)">41%</div>
+          <div class="na-predict-risk na-risk-med">MONITOR · Adyar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE CIVIC FEED — NEW -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">
+          <i class="ti ti-activity" style="color:var(--accent);font-size:16px"></i>
+          Live Civic Activity
+          <span class="card-badge">Auto-updates</span>
+        </div>
+        <div id="na-live-feed"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <i class="ti ti-chart-dots" style="color:var(--accent);font-size:16px"></i>
+          AI Quick Insights
+        </div>
+        <div class="na-insight-list">
+          <div class="na-insight-item na-insight-warn">
+            <div class="na-insight-tag">⚠ Alert</div>
+            <div class="na-insight-text">Flooding risk elevated 340% in North Chennai based on rainfall + drain capacity analysis</div>
+          </div>
+          <div class="na-insight-item na-insight-info">
+            <div class="na-insight-tag">💡 Tip</div>
+            <div class="na-insight-text">Deploy 4 extra trucks to Tambaram — 89% garbage overflow probability by Friday</div>
+          </div>
+          <div class="na-insight-item na-insight-ok">
+            <div class="na-insight-tag">✅ Win</div>
+            <div class="na-insight-text">Ward 14 achieved 95% complaint resolution — highest in district for 3rd month</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ===== PROMISE TRACKER ===== -->
@@ -398,6 +484,14 @@
             <div class="fb-text">"Garbage pickup is inconsistent. Needs a fixed schedule."</div>
           </div>
         </div>
+
+        <!-- VOTE ON LOCAL ISSUES — NEW -->
+        <div class="card-title" style="margin-top:18px;font-size:13px">
+          <i class="ti ti-thumb-up" style="color:var(--accent);font-size:14px"></i>
+          Vote on Local Issues
+        </div>
+        <div id="na-vote-list"></div>
+
       </div>
     </div>
   </div>
@@ -521,6 +615,67 @@
     <div id="modal-body"></div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════
+     AI CIVIC ASSISTANT — FLOATING WIDGET
+════════════════════════════════════════ -->
+<button class="na-ai-fab" id="na-ai-fab" onclick="naToggleAI()" title="NaalaatchiAI Assistant" aria-label="Open AI assistant">
+  <i class="ti ti-brain" id="na-fab-icon"></i>
+  <span class="na-fab-pulse" aria-hidden="true"></span>
+</button>
+
+<div class="na-ai-panel" id="na-ai-panel" role="dialog" aria-label="NaalaatchiAI Assistant" aria-hidden="true">
+  <!-- PANEL HEADER -->
+  <div class="na-ai-header">
+    <div>
+      <div class="na-ai-name">NaalaatchiAI</div>
+      <div class="na-ai-status"><span class="na-online-dot"></span>Online · Tamil & English</div>
+    </div>
+    <button class="na-ai-close" onclick="naToggleAI()" aria-label="Close assistant"><i class="ti ti-x"></i></button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="na-ai-messages" id="na-ai-messages" role="log" aria-live="polite">
+    <div class="na-msg na-msg-bot">
+      வணக்கம்! I'm NaalaatchiAI — your civic intelligence assistant for Ward 12, Tambaram. I can help you check complaint status, understand ward issues, get budget info, or predict civic risks. How can I help?
+    </div>
+  </div>
+
+  <!-- TYPING INDICATOR -->
+  <div id="na-typing" style="display:none;padding:0 12px 8px">
+    <div class="na-msg na-msg-bot" style="padding:8px 12px;display:inline-flex;gap:4px;align-items:center">
+      <span class="na-typing-dot"></span>
+      <span class="na-typing-dot" style="animation-delay:.2s"></span>
+      <span class="na-typing-dot" style="animation-delay:.4s"></span>
+    </div>
+  </div>
+
+  <!-- QUICK BUTTONS -->
+  <div class="na-quick-row">
+    <button class="na-quick-btn" onclick="naSendAI('What are the top complaints today?')">Top complaints</button>
+    <button class="na-quick-btn" onclick="naSendAI('Flood risk in Ward 12')">Flood risk</button>
+    <button class="na-quick-btn" onclick="naSendAI('Budget utilization status')">Budget</button>
+    <button class="na-quick-btn" onclick="naSendAI('How to report an issue?')">Report issue</button>
+  </div>
+
+  <!-- INPUT ROW -->
+  <div class="na-ai-input-row">
+    <input
+      class="na-ai-input"
+      id="na-ai-input"
+      type="text"
+      placeholder="Ask in Tamil or English..."
+      aria-label="Chat with NaalaatchiAI"
+      onkeydown="if(event.key==='Enter') naSendAI()"
+    />
+    <button class="na-ai-send" onclick="naSendAI()" aria-label="Send message">
+      <i class="ti ti-send"></i>
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="na-toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="app.js"></script>

@@ -847,3 +847,255 @@ function showToast(msg) {
 document.addEventListener('DOMContentLoaded', () => {
   updateAvatarUI();
 });
+
+/* ============================================================
+   ZEAI FEATURES — appended to NaalaatchiApp/app.js
+   All prefixed na- to avoid conflicts with existing code
+   ============================================================ */
+
+/* ─────────────────────────────────────────
+   PARTICLES
+───────────────────────────────────────── */
+(function makeParticles() {
+  const container = document.getElementById('na-particles');
+  if (!container) return;
+  for (let i = 0; i < 35; i++) {
+    const p = document.createElement('div');
+    p.className = 'na-particle';
+    const size = Math.random() * 2.5 + 1;
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random() * 100}%;
+      animation-duration:${9 + Math.random() * 14}s;
+      animation-delay:${Math.random() * 12}s;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+/* ─────────────────────────────────────────
+   LIVE CLOCK
+───────────────────────────────────────── */
+function naUpdateClock() {
+  const el = document.getElementById('na-live-clock');
+  if (!el) return;
+  el.textContent = new Date().toLocaleTimeString('en-IN', { hour12: false });
+}
+naUpdateClock();
+setInterval(naUpdateClock, 1000);
+
+/* ─────────────────────────────────────────
+   LIVE CIVIC FEED
+───────────────────────────────────────── */
+const NA_FEED_ITEMS = [
+  { icon: '✓',  bg: 'rgba(34,197,94,.12)',   color: '#22C55E', title: 'Complaint resolved — Ward 14 streetlight',    time: '2 min ago'  },
+  { icon: '⚠️', bg: 'rgba(245,158,11,.12)',   color: '#F59E0B', title: 'Garbage overflow alert — Tambaram sector',    time: '5 min ago'  },
+  { icon: '🤖', bg: 'rgba(168,85,247,.12)',   color: '#A855F7', title: 'AI triaged 14 complaints automatically',      time: '9 min ago'  },
+  { icon: '💧', bg: 'rgba(59,130,246,.12)',   color: '#3B82F6', title: 'Water restored — Ward 14 pipeline fixed',     time: '14 min ago' },
+  { icon: '📋', bg: 'rgba(59,130,246,.1)',    color: '#3B82F6', title: 'PWD team deployed — Pallavaram Main Rd',      time: '22 min ago' },
+  { icon: '🏆', bg: 'rgba(245,158,11,.1)',    color: '#F59E0B', title: 'Ward 12 satisfaction up 4% this week',        time: '31 min ago' },
+  { icon: '✓',  bg: 'rgba(34,197,94,.12)',   color: '#22C55E', title: '₹85L budget released — pipeline project',     time: '45 min ago' },
+  { icon: '🚨', bg: 'rgba(239,68,68,.12)',    color: '#EF4444', title: 'Flood pre-alert — North Chennai drains',      time: '1 hr ago'   },
+];
+
+function naRenderFeed() {
+  const el = document.getElementById('na-live-feed');
+  if (!el) return;
+  el.innerHTML = NA_FEED_ITEMS.slice(0, 6).map(f => `
+    <div class="na-feed-item">
+      <div class="na-feed-ico" style="background:${f.bg}">
+        <span style="color:${f.color}">${f.icon}</span>
+      </div>
+      <div>
+        <div class="na-feed-title">${f.title}</div>
+        <div class="na-feed-time">${f.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// Rotate feed every 6 seconds
+setInterval(() => {
+  NA_FEED_ITEMS.push(NA_FEED_ITEMS.shift());
+  naRenderFeed();
+}, 6000);
+
+/* ─────────────────────────────────────────
+   VOTE ON LOCAL ISSUES
+───────────────────────────────────────── */
+const NA_VOTES = [
+  { id: 1, title: 'Fix potholes on Main Rd before monsoon', votes: 847, total: 1200, voted: false },
+  { id: 2, title: 'Install CCTV at market street junction',  votes: 623, total: 1100, voted: false },
+  { id: 3, title: 'Resume twice-daily garbage collection',   votes: 512, total:  900, voted: false },
+  { id: 4, title: 'Build footpath along school zone',        votes: 389, total:  800, voted: false },
+];
+
+function naRenderVotes() {
+  const el = document.getElementById('na-vote-list');
+  if (!el) return;
+  el.innerHTML = NA_VOTES.map(v => {
+    const pct = Math.round((v.votes / v.total) * 100);
+    return `
+      <div class="na-vote-item">
+        <div class="na-vote-title">${v.title}</div>
+        <div class="na-vote-bar-bg">
+          <div class="na-vote-bar-fill" id="na-vbar-${v.id}" style="width:${pct}%"></div>
+        </div>
+        <div class="na-vote-meta">
+          <span>${v.votes.toLocaleString('en-IN')} votes</span>
+          <span>${pct}% support</span>
+        </div>
+        <button
+          class="na-vote-btn ${v.voted ? 'voted' : ''}"
+          id="na-vbtn-${v.id}"
+          onclick="naCastVote(${v.id})"
+        >${v.voted ? '✅ Voted' : '👍 Support this'}</button>
+      </div>`;
+  }).join('');
+}
+
+function naCastVote(id) {
+  const v = NA_VOTES.find(x => x.id === id);
+  if (!v || v.voted) return;
+  v.votes++;
+  v.voted = true;
+  const pct = Math.round((v.votes / v.total) * 100);
+  const bar = document.getElementById('na-vbar-' + id);
+  const btn = document.getElementById('na-vbtn-' + id);
+  if (bar) bar.style.width = pct + '%';
+  if (btn) { btn.textContent = '✅ Voted'; btn.classList.add('voted'); }
+  naShowToast('Vote recorded! Your voice counts 🗳️');
+}
+
+/* ─────────────────────────────────────────
+   AI ASSISTANT
+───────────────────────────────────────── */
+let naAIOpen = false;
+
+const NA_AI_RESPONSES = {
+  complaint: 'You can raise a complaint directly from the Complaints tab — click "Raise a Complaint". Fill in your name, ward, category and description. Our AI will validate it, check for duplicates, assign a priority, and route it to the right government department automatically.',
+  status: 'Current complaint status for Ward 12:\n• 43 active complaints\n• 14 resolved today\n• Top issues: Water supply (12), Roads (9), Drainage (8)\n• AI auto-processed: 91% routed within 5 minutes\n• Avg resolution time: 4.2 days',
+  water: 'Water supply status for Ward 12:\n• 24/7 pipeline project is 55% complete\n• Est. completion: August 2024\n• Current disruptions: Minor pressure drop in sub-lanes\n• CMWSSB helpline: 044-28592828\nWould you like to report a water issue?',
+  budget: 'Ward 12 Budget Status (2024):\n• Total sanctioned: ₹4.2 Cr\n• Utilized: ₹3.0 Cr (71%)\n• Pending release: ₹1.2 Cr\n• Largest spend: Infrastructure (₹1.8 Cr)\n• Transparency score: 78/100',
+  flood: 'Flood risk prediction for Tambaram / Ward 12:\n• Current risk level: MODERATE (38%)\n• North Chennai risk: HIGH (78%) — pre-alert issued\n• Drains at 72% capacity — monitor after rain\n• Action: Ensure drains near your street are clear\n• Emergency: NDRF helpline 1800-180-4567',
+  promise: 'Promise tracker for Councillor Ravi Kumar (Ward 12):\n• Total promises: 48\n• Delivered: 31 (64.6%)\n• In progress: 11 (22.9%)\n• Delayed: 6 (12.5%)\n• Top delayed: Urban Park Sector 4 (overdue 3 months)\nView full tracker in the Promise Tracker tab.',
+  councillor: 'Councillor Ravi Kumar — Ward 12, Tambaram:\n• AI Governance Score: 78/100\n• Citizen satisfaction: 76%\n• Budget utilization: 71%\n• Complaints resolved: 164 this quarter\n• Pending: 31\n• Trend: ↑ improving vs last quarter',
+  sentiment: 'Public sentiment for Ward 12:\n• Positive: 48% (satisfied)\n• Neutral: 24%\n• Negative: 28% (main issues: roads, water)\n• Total responses: 4,812\n• Trend: +3% positive this week\nView detailed breakdown in the Sentiment tab.',
+  road: 'Road project update — Ward 12:\n• Road Widening (Anna Nagar–Pallavaram): 92% complete\n• Asphalt laying Section B in progress\n• Est. completion: June 2024\n• Contractor: Rajan & Co.\n• Budget: ₹1.2 Cr sanctioned\nTrack full timeline in the Projects tab.',
+  help: 'I can help you with:\n\n📊 Complaint status & counts\n💧 Water supply updates\n🛣️ Road & project timelines\n💰 Budget & spending info\n🌊 Flood & risk predictions\n🏛️ Councillor performance\n📋 How to raise a complaint\n😊 Sentiment & feedback data\n\nJust type your question in Tamil or English!',
+  tamil: 'நான் தமிழிலும் பேசுவேன்! உங்கள் கேள்வியை தமிழில் கேளுங்கள். உதாரணம்:\n• "தண்ணீர் பிரச்சனை" — water issue\n• "புகார்" — complaint\n• "பட்ஜெட்" — budget\n• "சாலை" — road\nHow can I help you today?',
+  thanks: 'நன்றி! Thank you for using NaalaatchiApp. Your civic participation makes our ward stronger. Is there anything else I can help you with? 🙏',
+  default: 'I\'m NaalaatchiAI for Ward 12, Tambaram. I can help with complaint status, water supply, road projects, budget info, flood predictions, councillor performance, or how to report an issue.\n\nType "help" to see everything I can do, or ask me directly in Tamil or English!'
+};
+
+function naGetResponse(text) {
+  const t = text.toLowerCase();
+  if (t.includes('complain') || t.includes('report') || t.includes('ticket') || t.includes('புகார்')) return NA_AI_RESPONSES.complaint;
+  if (t.includes('status') || t.includes('active') || t.includes('how many'))                         return NA_AI_RESPONSES.status;
+  if (t.includes('water') || t.includes('தண்ணீர்') || t.includes('pipeline'))                        return NA_AI_RESPONSES.water;
+  if (t.includes('budget') || t.includes('money') || t.includes('பட்ஜெட்') || t.includes('spend'))  return NA_AI_RESPONSES.budget;
+  if (t.includes('flood') || t.includes('rain') || t.includes('drain') || t.includes('வெள்ளம்'))    return NA_AI_RESPONSES.flood;
+  if (t.includes('promise') || t.includes('deliver') || t.includes('வாக்குறுதி'))                   return NA_AI_RESPONSES.promise;
+  if (t.includes('councillor') || t.includes('ravi') || t.includes('performance') || t.includes('score')) return NA_AI_RESPONSES.councillor;
+  if (t.includes('sentiment') || t.includes('satisfaction') || t.includes('feedback') || t.includes('opinion')) return NA_AI_RESPONSES.sentiment;
+  if (t.includes('road') || t.includes('pothole') || t.includes('சாலை') || t.includes('widening'))  return NA_AI_RESPONSES.road;
+  if (t.includes('help') || t.includes('உதவி') || t.includes('what can'))                            return NA_AI_RESPONSES.help;
+  if (t.includes('tamil') || t.includes('தமிழ்') || t.includes('வணக்கம்'))                         return NA_AI_RESPONSES.tamil;
+  if (t.includes('thank') || t.includes('நன்றி') || t.includes('great') || t.includes('good'))      return NA_AI_RESPONSES.thanks;
+  return NA_AI_RESPONSES.default;
+}
+
+function naToggleAI() {
+  naAIOpen = !naAIOpen;
+  const panel = document.getElementById('na-ai-panel');
+  const icon  = document.getElementById('na-fab-icon');
+  if (!panel) return;
+  panel.classList.toggle('na-open', naAIOpen);
+  panel.setAttribute('aria-hidden', String(!naAIOpen));
+  if (icon) icon.className = naAIOpen ? 'ti ti-x' : 'ti ti-brain';
+  if (naAIOpen) {
+    setTimeout(() => {
+      const input = document.getElementById('na-ai-input');
+      if (input) input.focus();
+      const msgs = document.getElementById('na-ai-messages');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    }, 300);
+  }
+}
+
+function naSendAI(presetMsg) {
+  const input = document.getElementById('na-ai-input');
+  const text  = presetMsg || (input ? input.value.trim() : '');
+  if (!text) return;
+  if (input) input.value = '';
+
+  const msgs   = document.getElementById('na-ai-messages');
+  const typing = document.getElementById('na-typing');
+  if (!msgs) return;
+
+  // Add user message
+  const userMsg = document.createElement('div');
+  userMsg.className = 'na-msg na-msg-user';
+  userMsg.textContent = text;
+  msgs.appendChild(userMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Show typing indicator
+  if (typing) typing.style.display = 'block';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Respond after realistic delay
+  const delay = 900 + Math.random() * 800;
+  setTimeout(() => {
+    if (typing) typing.style.display = 'none';
+    const response = naGetResponse(text);
+
+    const botMsg = document.createElement('div');
+    botMsg.className = 'na-msg na-msg-bot';
+    botMsg.innerHTML = response.replace(/\n/g, '<br>');
+    msgs.appendChild(botMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, delay);
+}
+
+/* ─────────────────────────────────────────
+   TOAST NOTIFICATION
+───────────────────────────────────────── */
+function naShowToast(msg) {
+  // Use existing showToast if it exists (from auth system), else use own
+  if (typeof showToast === 'function') { showToast(msg); return; }
+  const el = document.getElementById('na-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('na-toast-show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('na-toast-show'), 3000);
+}
+
+/* ─────────────────────────────────────────
+   LIVE STATS COUNTER (subtle increment)
+───────────────────────────────────────── */
+function naLiveStats() {
+  // Gently increment "Active Complaints" counter in the dashboard stat card
+  const statEls = document.querySelectorAll('.stat-value.amber');
+  statEls.forEach(el => {
+    const cur = parseInt(el.textContent);
+    if (!isNaN(cur) && Math.random() > 0.6) {
+      el.textContent = cur + Math.floor(Math.random() * 2);
+    }
+  });
+}
+setInterval(naLiveStats, 10000);
+
+/* ─────────────────────────────────────────
+   INIT — run after DOM + existing app.js
+───────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  naRenderFeed();
+  naRenderVotes();
+});
+
+// Also render on window load as a fallback
+window.addEventListener('load', () => {
+  naRenderFeed();
+  naRenderVotes();
+});
