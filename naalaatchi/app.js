@@ -1226,3 +1226,250 @@ window.addEventListener('load', () => {
   naRenderFeed();
   naRenderVotes();
 });
+
+/* ============================================================
+   LANGUAGE TOGGLE — Tamil / English
+   ============================================================ */
+let currentLang = 'en';
+
+// Full translation map
+const TRANSLATIONS = {
+  en: {
+    // Nav
+    'Overview': 'Overview', 'Councillors': 'Councillors', 'Wards': 'Wards',
+    // Header
+    'NaalaatchiApp': 'NaalaatchiApp', 'Digital Governance Platform': 'Digital Governance Platform',
+    // Dashboard
+    'TVK Promises': 'TVK Promises', 'Active Complaints': 'Active Complaints',
+    'Public Satisfaction': 'Public Satisfaction', 'In Progress': 'In Progress',
+    'Promise vs Delivery': 'Promise vs Delivery', 'Complaint Trend (30 days)': 'Complaint Trend (30 days)',
+    'Top Issues This Week': 'Top Issues This Week', 'Budget Utilization': 'Budget Utilization',
+    'Govt. Update Feed': 'Govt. Update Feed',
+    // Tickets
+    'Raise a Complaint': 'Raise a Complaint', 'My Complaints': 'My Complaints',
+    'Submit Complaint': 'Submit Complaint',
+    // Complaint form placeholders
+    'Enter your full name': 'Enter your full name',
+    'Brief title of your issue': 'Brief title of your issue',
+    'Describe your issue in detail...': 'Describe your issue in detail...',
+    'Near Tambaram Bus Stand, Street 4...': 'Near Tambaram Bus Stand, Street 4...',
+    // Ward/Map
+    'Tamil Nadu Governance Map': 'Tamil Nadu Governance Map',
+    'All Wards': 'All Wards',
+    // Sentiment
+    'Sentiment Distribution': 'Sentiment Distribution',
+    'Issue Heatmap by Category': 'Issue Heatmap by Category',
+    'Vote on Local Issues': 'Vote on Local Issues',
+    // Performance
+    'Councillor Performance Leaderboard': 'Councillor Performance Leaderboard',
+    // AI assistant
+    'NaalaatchiAI': 'NaalaatchiAI',
+    'Online · Tamil & English': 'Online · Tamil & English',
+    // Notif
+    'Notifications': 'Notifications',
+  },
+  ta: {
+    // Nav
+    'Overview': 'முகப்பு', 'Councillors': 'உறுப்பினர்கள்', 'Wards': 'வார்டுகள்',
+    // Header
+    'NaalaatchiApp': 'நாளாட்சி ஆப்', 'Digital Governance Platform': 'டிஜிட்டல் ஆட்சி தளம்',
+    // Dashboard
+    'TVK Promises': 'TVK வாக்குறுதிகள்', 'Active Complaints': 'செயலில் உள்ள புகார்கள்',
+    'Public Satisfaction': 'பொது திருப்தி', 'In Progress': 'செயல்பாட்டில் உள்ளது',
+    'Promise vs Delivery': 'வாக்குறுதி vs நிறைவேற்றம்', 'Complaint Trend (30 days)': 'புகார் போக்கு (30 நாட்கள்)',
+    'Top Issues This Week': 'இந்த வாரம் முக்கிய பிரச்சனைகள்', 'Budget Utilization': 'பட்ஜெட் பயன்பாடு',
+    'Govt. Update Feed': 'அரசு புதுப்பிப்பு',
+    // Tickets
+    'Raise a Complaint': 'புகார் அளிக்கவும்', 'My Complaints': 'என் புகார்கள்',
+    'Submit Complaint': 'புகார் சமர்ப்பிக்கவும்',
+    // Complaint form
+    'Enter your full name': 'உங்கள் முழு பெயரை உள்ளிடவும்',
+    'Brief title of your issue': 'பிரச்சனையின் சுருக்கமான தலைப்பு',
+    'Describe your issue in detail...': 'உங்கள் பிரச்சனையை விரிவாக விவரிக்கவும்...',
+    'Near Tambaram Bus Stand, Street 4...': 'தாம்பரம் பஸ் நிறுத்தம் அருகில், தெரு 4...',
+    // Ward/Map
+    'Tamil Nadu Governance Map': 'தமிழ்நாடு ஆட்சி வரைபடம்',
+    'All Wards': 'அனைத்து வார்டுகள்',
+    // Sentiment
+    'Sentiment Distribution': 'கருத்து விநியோகம்',
+    'Issue Heatmap by Category': 'வகை வாரியான பிரச்சனை வரைபடம்',
+    'Vote on Local Issues': 'உள்ளூர் பிரச்சனைகளில் வாக்களிக்கவும்',
+    // Performance
+    'Councillor Performance Leaderboard': 'உறுப்பினர் செயல்திறன் பட்டியல்',
+    // AI assistant
+    'NaalaatchiAI': 'நாளாட்சி AI',
+    'Online · Tamil & English': 'ஆன்லைன் · தமிழ் & ஆங்கிலம்',
+    // Notif
+    'Notifications': 'அறிவிப்புகள்',
+  }
+};
+
+// All data-en/data-ta labeled content + inputs with data-placeholder-*
+function applyLanguage(lang) {
+  currentLang = lang;
+  const isTamil = lang === 'ta';
+
+  // Toggle button UI
+  const btn   = document.getElementById('lang-toggle-btn');
+  const label = document.getElementById('lang-label');
+  if (btn)   btn.classList.toggle('lang-ta', isTamil);
+  if (label) label.textContent = isTamil ? 'தமிழ்' : 'EN';
+
+  // All [data-en] and [data-ta] elements
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = isTamil ? (el.getAttribute('data-ta') || el.getAttribute('data-en')) : el.getAttribute('data-en');
+    if (isTamil) el.classList.add('lang-ta-text');
+    else         el.classList.remove('lang-ta-text');
+  });
+
+  // Inputs with placeholder translations
+  document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+    el.placeholder = isTamil
+      ? (el.getAttribute('data-placeholder-ta') || el.getAttribute('data-placeholder-en'))
+      : el.getAttribute('data-placeholder-en');
+  });
+
+  // AI assistant name
+  const aiName = document.querySelector('.na-ai-name');
+  if (aiName) aiName.textContent = isTamil ? 'நாளாட்சி AI' : 'NaalaatchiAI';
+
+  const aiStatus = document.querySelector('.na-ai-status');
+  if (aiStatus) {
+    const dot = aiStatus.querySelector('.na-online-dot');
+    aiStatus.innerHTML = '';
+    if (dot) aiStatus.appendChild(dot);
+    aiStatus.appendChild(document.createTextNode(isTamil ? ' ஆன்லைன் · தமிழ் & ஆங்கிலம்' : ' Online · Tamil & English'));
+  }
+
+  // Logo sub
+  const logoSub = document.querySelector('.logo-sub');
+  if (logoSub) logoSub.textContent = isTamil ? 'டிஜிட்டல் ஆட்சி தளம்' : 'Digital Governance Platform';
+
+  // Complaint form submit button
+  const submitBtn = document.querySelector('.ticket-form .btn-primary');
+  if (submitBtn) submitBtn.innerHTML = isTamil
+    ? '<i class="ti ti-send"></i> புகார் சமர்ப்பிக்கவும்'
+    : '<i class="ti ti-send"></i> Submit Complaint';
+
+  // Filter buttons
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const filterLabels = {
+    en: ['All', 'Open', 'In Progress', 'Resolved', 'Cancelled'],
+    ta: ['அனைத்தும்', 'திறந்தது', 'செயல்பாட்டில்', 'தீர்க்கப்பட்டது', 'ரத்து செய்யப்பட்டது'],
+  };
+  filterBtns.forEach((btn, i) => {
+    if (filterLabels[lang][i]) btn.textContent = filterLabels[lang][i];
+  });
+
+  // Ward search placeholder
+  const wardSearch = document.getElementById('ward-search-input');
+  if (wardSearch) wardSearch.placeholder = isTamil ? 'வார்டு அல்லது மண்டலம் தேடவும்...' : 'Search ward or zone...';
+
+  // Alert ticker
+  const alertInner = document.getElementById('na-alert-text');
+  if (alertInner) alertInner.textContent = isTamil
+    ? '✅ வார்டு 14 குடிநீர் திட்டம் முடிந்தது — சேவை மீட்டமைக்கப்பட்டது   |   ⚠️ குப்பை அதிகரிப்பு எச்சரிக்கை: தாம்பரம் — குழு அனுப்பப்பட்டது   |   🤖 AI இன்று 127 புகார்களை செயலாக்கியது — 91% 5 நிமிடத்தில் திசைதிருப்பப்பட்டது'
+    : '✅ Ward 14 water pipeline repair completed — service restored   |   ⚠️ Garbage overflow alert: Tambaram sector — crew dispatched   |   🤖 AI triaged 127 complaints today — 91% routed in under 5 minutes';
+
+  // AI quick buttons
+  const quickBtns = document.querySelectorAll('.na-quick-btn');
+  const quickLabels = {
+    en: ['Top complaints', 'Flood risk', 'Budget', 'Report issue'],
+    ta: ['முக்கிய புகார்கள்', 'வெள்ள ஆபத்து', 'பட்ஜெட்', 'புகார் அளிக்கவும்'],
+  };
+  quickBtns.forEach((btn, i) => {
+    if (quickLabels[lang][i]) btn.textContent = quickLabels[lang][i];
+  });
+
+  // Notify panel header
+  const notifHeader = document.querySelector('.notif-panel-header span');
+  if (notifHeader) notifHeader.textContent = isTamil ? 'அறிவிப்புகள்' : 'Notifications';
+
+  // Notif items
+  document.querySelectorAll('.notif-title[data-en]').forEach(el => {
+    el.textContent = isTamil ? el.getAttribute('data-ta') : el.getAttribute('data-en');
+  });
+
+  // AI first message
+  const firstMsg = document.querySelector('.na-msg.na-msg-bot');
+  if (firstMsg && firstMsg.dataset.default) {
+    firstMsg.innerHTML = isTamil
+      ? 'வணக்கம்! நான் நாளாட்சி AI — வார்டு 12, தாம்பரத்திற்கான குடிமை உதவியாளர். புகார் நிலை, வார்டு தகவல், TVK வாக்குறுதிகள் அல்லது பட்ஜெட் பற்றி கேளுங்கள்!'
+      : 'வணக்கம்! I\'m NaalaatchiAI — your civic intelligence assistant for Ward 12, Tambaram. I can help you check complaint status, understand ward issues, get budget info, or predict civic risks. How can I help?';
+  }
+
+  // Save preference
+  try { localStorage.setItem('naalaatchi_lang', lang); } catch(e) {}
+}
+
+function toggleLanguage() {
+  applyLanguage(currentLang === 'en' ? 'ta' : 'en');
+}
+
+/* ============================================================
+   DARK / LIGHT THEME TOGGLE
+   ============================================================ */
+let isDark = false;
+
+function applyTheme(dark) {
+  isDark = dark;
+  document.body.classList.toggle('dark-mode', dark);
+  const icon = document.getElementById('theme-icon');
+  if (icon) icon.className = dark ? 'ti ti-moon' : 'ti ti-sun';
+  try { localStorage.setItem('naalaatchi_theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+
+function toggleTheme() {
+  applyTheme(!isDark);
+  naShowToast(isDark ? (currentLang === 'ta' ? '🌙 இருண்ட பயன்முறை' : '🌙 Dark mode on') : (currentLang === 'ta' ? '☀️ ஒளி பயன்முறை' : '☀️ Light mode on'));
+}
+
+/* ============================================================
+   NOTIFICATION PANEL
+   ============================================================ */
+let notifOpen = false;
+
+function toggleNotifPanel() {
+  notifOpen = !notifOpen;
+  const panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  panel.style.display = notifOpen ? 'block' : 'none';
+  // Remove new indicator when opened
+  if (notifOpen) {
+    const dot = document.querySelector('.notif-dot');
+    if (dot) dot.style.display = 'none';
+  }
+}
+
+// Close notif panel on outside click
+document.addEventListener('click', (e) => {
+  if (!notifOpen) return;
+  const panel = document.getElementById('notif-panel');
+  const btn   = document.getElementById('notif-btn');
+  if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+    notifOpen = false;
+    panel.style.display = 'none';
+  }
+});
+
+/* ============================================================
+   RESTORE SAVED PREFERENCES ON LOAD
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore theme
+  try {
+    const savedTheme = localStorage.getItem('naalaatchi_theme');
+    if (savedTheme === 'dark') applyTheme(true);
+    else applyTheme(false); // default = light
+  } catch(e) { applyTheme(false); }
+
+  // Restore language
+  try {
+    const savedLang = localStorage.getItem('naalaatchi_lang');
+    if (savedLang === 'ta') applyLanguage('ta');
+  } catch(e) {}
+
+  // Mark first AI message as default
+  const firstMsg = document.querySelector('.na-msg.na-msg-bot');
+  if (firstMsg) firstMsg.dataset.default = 'true';
+});

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NaalaatchiApp — Digital Governance Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
@@ -46,13 +46,52 @@
   </nav>
   <div class="header-right">
     <div class="ward-badge">Ward <span>12 — Tambaram</span></div>
-    <div class="notif-btn"><i class="ti ti-bell"></i><span class="notif-dot"></span></div>
+    <!-- LANGUAGE TOGGLE -->
+    <button class="lang-toggle-btn" id="lang-toggle-btn" onclick="toggleLanguage()" title="Switch to Tamil / English" aria-label="Toggle language">
+      <span class="lang-icon">அ</span>
+      <span class="lang-label" id="lang-label">EN</span>
+    </button>
+    <!-- DARK MODE TOGGLE -->
+    <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">
+      <i class="ti ti-sun" id="theme-icon"></i>
+    </button>
+    <div class="notif-btn" id="notif-btn" onclick="toggleNotifPanel()" title="Notifications"><i class="ti ti-bell"></i><span class="notif-dot"></span></div>
     <!-- Avatar: shows initials if logged in, person icon if not -->
     <div class="avatar-btn" id="avatar-btn" onclick="openProfile()" title="Profile / Login">
       <span id="avatar-label"><i class="ti ti-user"></i></span>
     </div>
   </div>
 </header>
+
+<!-- NOTIFICATION PANEL -->
+<div id="notif-panel" class="notif-panel" style="display:none">
+  <div class="notif-panel-header">
+    <span data-en="Notifications" data-ta="அறிவிப்புகள்">Notifications</span>
+    <button onclick="toggleNotifPanel()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="notif-list">
+    <div class="notif-item notif-new">
+      <div class="notif-icon" style="background:rgba(239,68,68,.12);color:var(--red)"><i class="ti ti-alert-triangle"></i></div>
+      <div><div class="notif-title" data-en="Flood risk alert — North Chennai" data-ta="வெள்ள அபாய எச்சரிக்கை — வட சென்னை">Flood risk alert — North Chennai</div><div class="notif-time">2 min ago</div></div>
+    </div>
+    <div class="notif-item notif-new">
+      <div class="notif-icon" style="background:rgba(34,197,94,.12);color:var(--green)"><i class="ti ti-check"></i></div>
+      <div><div class="notif-title" data-en="Your complaint #TKT-0089 is In Progress" data-ta="உங்கள் புகார் #TKT-0089 செயல்பாட்டில் உள்ளது">Your complaint #TKT-0089 is In Progress</div><div class="notif-time">15 min ago</div></div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon" style="background:rgba(59,130,246,.12);color:var(--accent)"><i class="ti ti-droplet"></i></div>
+      <div><div class="notif-title" data-en="Water supply restored — Ward 14" data-ta="குடிநீர் விநியோகம் மீட்டமைக்கப்பட்டது — வார்டு 14">Water supply restored — Ward 14</div><div class="notif-time">1 hr ago</div></div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon" style="background:rgba(168,85,247,.12);color:var(--purple)"><i class="ti ti-brain"></i></div>
+      <div><div class="notif-title" data-en="AI resolved 89 complaints today" data-ta="AI இன்று 89 புகார்களை தீர்த்தது">AI resolved 89 complaints today</div><div class="notif-time">3 hrs ago</div></div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon" style="background:rgba(245,158,11,.12);color:var(--amber)"><i class="ti ti-coin"></i></div>
+      <div><div class="notif-title" data-en="₹85L released for Ward 12 pipeline" data-ta="வார்டு 12 குழாய் திட்டத்திற்கு ₹85L வெளியிடப்பட்டது">₹85L released for Ward 12 pipeline</div><div class="notif-time">5 hrs ago</div></div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════
      AUTH MODAL (Login / Register)
@@ -220,13 +259,13 @@
 
   <!-- SECTION TABS -->
   <div class="section-tabs">
-    <button class="stab active" onclick="switchSection(this,'dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
-    <button class="stab" onclick="switchSection(this,'promises')"><i class="ti ti-target"></i> TVK Promises</button>
-    <button class="stab" onclick="switchSection(this,'projects')"><i class="ti ti-timeline"></i> Projects</button>
-    <button class="stab" onclick="switchSection(this,'wards')"><i class="ti ti-map-2"></i> Wards & Map</button>
-    <button class="stab" onclick="switchSection(this,'sentiment')"><i class="ti ti-mood-happy"></i> Sentiment</button>
-    <button class="stab" onclick="switchSection(this,'tickets')"><i class="ti ti-ticket"></i> Complaints</button>
-    <button class="stab" onclick="switchSection(this,'performance')"><i class="ti ti-chart-bar"></i> Councillors</button>
+    <button class="stab active" onclick="switchSection(this,'dashboard')"><i class="ti ti-layout-dashboard"></i> <span data-en="Dashboard" data-ta="முகப்பு">Dashboard</span></button>
+    <button class="stab" onclick="switchSection(this,'promises')"><i class="ti ti-target"></i> <span data-en="TVK Promises" data-ta="TVK வாக்குறுதிகள்">TVK Promises</span></button>
+    <button class="stab" onclick="switchSection(this,'projects')"><i class="ti ti-timeline"></i> <span data-en="Projects" data-ta="திட்டங்கள்">Projects</span></button>
+    <button class="stab" onclick="switchSection(this,'wards')"><i class="ti ti-map-2"></i> <span data-en="Wards & Map" data-ta="வார்டு & வரைபடம்">Wards & Map</span></button>
+    <button class="stab" onclick="switchSection(this,'sentiment')"><i class="ti ti-mood-happy"></i> <span data-en="Sentiment" data-ta="கருத்துகள்">Sentiment</span></button>
+    <button class="stab" onclick="switchSection(this,'tickets')"><i class="ti ti-ticket"></i> <span data-en="Complaints" data-ta="புகார்கள்">Complaints</span></button>
+    <button class="stab" onclick="switchSection(this,'performance')"><i class="ti ti-chart-bar"></i> <span data-en="Councillors" data-ta="உறுப்பினர்கள்">Councillors</span></button>
   </div>
 
   <!-- ===== DASHBOARD ===== -->
@@ -234,28 +273,28 @@
 
     <div class="stat-grid">
       <div class="stat-card">
-        <div class="stat-label">TVK Promises</div>
+        <div class="stat-label" data-en="TVK Promises" data-ta="TVK வாக்குறுதிகள்">TVK Promises</div>
         <div class="stat-value accent">12</div>
-        <div class="stat-sub">Key manifesto commitments</div>
-        <div class="stat-change change-dn"><i class="ti ti-clock"></i> 0 delivered · election pending</div>
+        <div class="stat-sub" data-en="Key manifesto commitments" data-ta="முக்கிய தேர்தல் வாக்குறுதிகள்">Key manifesto commitments</div>
+        <div class="stat-change change-dn"><i class="ti ti-clock"></i> <span data-en="0 delivered · election pending" data-ta="0 நிறைவேற்றப்பட்டது · தேர்தல் நிலுவையில்">0 delivered · election pending</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">In Progress</div>
+        <div class="stat-label" data-en="In Progress" data-ta="செயல்பாட்டில்">In Progress</div>
         <div class="stat-value amber">3</div>
-        <div class="stat-sub">AI governance, water, roads</div>
-        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> Pre-election groundwork</div>
+        <div class="stat-sub" data-en="AI governance, water, roads" data-ta="AI ஆட்சி, தண்ணீர், சாலைகள்">AI governance, water, roads</div>
+        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> <span data-en="Pre-election groundwork" data-ta="தேர்தலுக்கு முன் நடவடிக்கை">Pre-election groundwork</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Active Complaints</div>
+        <div class="stat-label" data-en="Active Complaints" data-ta="செயலில் உள்ள புகார்கள்">Active Complaints</div>
         <div class="stat-value red">1,247</div>
-        <div class="stat-sub">Across 36 GCC wards</div>
-        <div class="stat-change change-dn"><i class="ti ti-arrow-down"></i> 89 resolved today</div>
+        <div class="stat-sub" data-en="Across 36 GCC wards" data-ta="36 GCC வார்டுகளில்">Across 36 GCC wards</div>
+        <div class="stat-change change-dn"><i class="ti ti-arrow-down"></i> <span data-en="89 resolved today" data-ta="இன்று 89 தீர்க்கப்பட்டது">89 resolved today</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Public Satisfaction</div>
+        <div class="stat-label" data-en="Public Satisfaction" data-ta="பொது திருப்தி">Public Satisfaction</div>
         <div class="stat-value purple">72%</div>
-        <div class="stat-sub">Based on 4,812 responses</div>
-        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> +3% this week</div>
+        <div class="stat-sub" data-en="Based on 4,812 responses" data-ta="4,812 கருத்துகளின் அடிப்படையில்">Based on 4,812 responses</div>
+        <div class="stat-change change-up"><i class="ti ti-arrow-up"></i> <span data-en="+3% this week" data-ta="இந்த வாரம் +3%">+3% this week</span></div>
       </div>
     </div>
 
@@ -557,13 +596,13 @@
 
       <!-- RAISE TICKET -->
       <div class="card ticket-form">
-        <div class="card-title">Raise a Complaint <i class="ti ti-plus" style="color:var(--accent);font-size:16px"></i></div>
+        <div class="card-title"><span data-en="Raise a Complaint" data-ta="புகார் அளிக்கவும்">Raise a Complaint</span> <i class="ti ti-plus" style="color:var(--accent);font-size:16px"></i></div>
         <div class="form-group">
-          <label class="form-label">Your Name *</label>
-          <input type="text" id="t-name" placeholder="Enter your full name"/>
+          <label class="form-label"><span data-en="Your Name *" data-ta="உங்கள் பெயர் *">Your Name *</span></label>
+          <input type="text" id="t-name" placeholder="Enter your full name" data-placeholder-en="Enter your full name" data-placeholder-ta="உங்கள் முழு பெயரை உள்ளிடவும்"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Mobile Number *</label>
+          <label class="form-label"><span data-en="Mobile Number *" data-ta="கைபேசி எண் *">Mobile Number *</span></label>
           <input type="tel" id="t-phone" placeholder="+91 98765 43210"/>
         </div>
         <div class="form-row">

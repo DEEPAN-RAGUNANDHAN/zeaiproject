@@ -1,11 +1,47 @@
 /* ============================================================
    NaalaatchiApp — Digital Governance Platform
-   style.css
+   style.css — Light Theme Default
    ============================================================ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── LIGHT THEME (default) ── */
 :root {
+  --bg:     #F0F4F8;
+  --bg2:    #FFFFFF;
+  --bg3:    #E8EEF5;
+  --card:   #FFFFFF;
+  --card2:  #EDF2F8;
+  --border: #D1DCE8;
+  --border2:#B8CBE0;
+
+  --text:   #0F1923;
+  --text2:  #3D5166;
+  --text3:  #7A92A8;
+
+  --accent: #1A6FE8;
+  --accent2:#1557C0;
+  --green:  #16A34A;
+  --green2: #14532D;
+  --amber:  #D97706;
+  --amber2: #92400E;
+  --red:    #DC2626;
+  --red2:   #991B1B;
+  --purple: #7C3AED;
+  --teal:   #0D9488;
+
+  --radius:    12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+
+  /* shadows for light mode */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 32px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* ── DARK THEME (toggled via .dark-mode on body) ── */
+body.dark-mode {
   --bg:     #0A0F1E;
   --bg2:    #0E1525;
   --bg3:    #131C32;
@@ -29,9 +65,9 @@
   --purple: #A855F7;
   --teal:   #14B8A6;
 
-  --radius:    12px;
-  --radius-sm: 8px;
-  --radius-xs: 6px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 32px rgba(0,0,0,0.5);
 }
 
 html { scroll-behavior: smooth; }
@@ -43,13 +79,14 @@ body {
   font-size: 14px;
   line-height: 1.6;
   min-height: 100vh;
+  transition: background .3s, color .3s;
 }
 
 h1, h2, h3, .label { font-family: 'Space Grotesk', sans-serif; }
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-track { background: var(--bg3); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
 /* ============================================================
@@ -1154,3 +1191,326 @@ h1, h2, h3, .label { font-family: 'Space Grotesk', sans-serif; }
 #na-toast.na-toast-show{
   opacity:1;transform:translateX(-50%) translateY(0);
 }
+
+/* ============================================================
+   LIGHT MODE CARD + COMPONENT UPGRADES
+   ============================================================ */
+
+/* Cards get a proper shadow in light mode */
+.card, .glass, .glass-bright, .stat-card {
+  box-shadow: var(--shadow-sm);
+  transition: background .3s, border-color .2s, box-shadow .2s, color .3s;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Section tabs — lighter feel */
+.section-tabs {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.stab.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent2);
+}
+.stab:hover:not(.active) {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+/* Header light mode */
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Inputs light mode */
+.ticket-form input,
+.ticket-form select,
+.ticket-form textarea,
+.auth-input,
+.auth-citizen-input {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+.ticket-form input:focus,
+.ticket-form select:focus,
+.ticket-form textarea:focus,
+.auth-input:focus {
+  border-color: var(--accent);
+  background: var(--bg2);
+  box-shadow: 0 0 0 3px rgba(26,111,232,.1);
+}
+.ticket-form select option,
+.auth-input option {
+  background: var(--bg2);
+  color: var(--text);
+}
+
+/* Profile panel */
+.profile-panel {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+.auth-modal {
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+}
+.modal {
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+}
+
+/* AI panel */
+.na-ai-panel {
+  background: var(--bg2);
+  box-shadow: var(--shadow-lg);
+}
+.na-msg-bot {
+  background: var(--bg3);
+  border-color: var(--border);
+  color: var(--text);
+}
+.na-msg-user {
+  background: rgba(26,111,232,.12);
+  border-color: rgba(26,111,232,.25);
+  color: var(--text);
+}
+.na-ai-input {
+  background: var(--bg3);
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+/* Notif panel light */
+.notif-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+.notif-item:hover {
+  background: var(--bg3);
+}
+
+/* Alert banner */
+.na-alert-banner {
+  background: rgba(26,111,232,.06);
+  border-bottom: 1px solid rgba(26,111,232,.15);
+}
+
+/* Ticket items */
+.ticket-item {
+  background: var(--bg2);
+  border-color: var(--border);
+}
+.ticket-item:hover {
+  border-color: var(--accent);
+  background: var(--card2);
+}
+
+/* AI verdict in light mode */
+.ai-verdict {
+  background: rgba(124,58,237,.06);
+  border-color: rgba(124,58,237,.15);
+}
+
+/* Perf table */
+.perf-table th {
+  background: var(--bg3);
+}
+.perf-table tr:hover td {
+  background: var(--bg3);
+}
+
+/* Ward cards */
+#ward-cards-grid .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Feedback items */
+.feedback-item.positive { background: rgba(22,163,74,.06); border-color: rgba(22,163,74,.2); }
+.feedback-item.negative { background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.2); }
+.feedback-item.neutral  { background: rgba(217,119,6,.06);  border-color: rgba(217,119,6,.2); }
+
+/* Stat cards value colors — ensure contrast in light mode */
+.stat-value.accent { color: var(--accent); }
+.stat-value.green  { color: var(--green); }
+.stat-value.amber  { color: var(--amber); }
+.stat-value.red    { color: var(--red); }
+.stat-value.purple { color: var(--purple); }
+
+/* stat change */
+.change-up { background: rgba(22,163,74,.1);  color: var(--green); }
+.change-dn { background: rgba(220,38,38,.1);  color: var(--red); }
+
+/* issue tags */
+.issue-tag {
+  background: var(--bg3);
+  border-color: var(--border);
+}
+.issue-tag:hover {
+  background: var(--card2);
+  border-color: var(--border2);
+}
+
+/* na-predict cards */
+.na-predict-card {
+  background: var(--bg2);
+  border-color: var(--border);
+}
+.na-predict-card:hover { box-shadow: var(--shadow-md); }
+
+/* na feed */
+.na-feed-title { color: var(--text); }
+
+/* na vote */
+.na-vote-item {
+  background: var(--bg3);
+  border-color: var(--border);
+}
+.na-vote-btn {
+  background: var(--bg2);
+  border-color: var(--border);
+  color: var(--text2);
+}
+.na-vote-btn:hover { background: rgba(26,111,232,.1); color: var(--accent); border-color: var(--accent); }
+.na-vote-btn.voted { background: rgba(22,163,74,.1); color: var(--green); border-color: var(--green); }
+
+/* ============================================================
+   LANGUAGE TOGGLE BUTTON
+   ============================================================ */
+.lang-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border2);
+  color: var(--text2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  transition: all .2s;
+  letter-spacing: .04em;
+  position: relative;
+  overflow: hidden;
+}
+.lang-toggle-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent2);
+  box-shadow: 0 2px 8px rgba(26,111,232,.25);
+}
+.lang-toggle-btn.lang-ta {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #fff;
+  border-color: transparent;
+}
+.lang-icon {
+  font-size: 15px;
+  line-height: 1;
+  font-family: 'Noto Sans Tamil', 'DM Sans', sans-serif;
+}
+.lang-label {
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+
+/* ============================================================
+   NOTIFICATION PANEL
+   ============================================================ */
+.notif-btn {
+  position: relative;
+  width: 34px; height: 34px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text2); font-size: 18px;
+  transition: all .2s;
+}
+.notif-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.notif-panel {
+  position: fixed;
+  top: 66px; right: 16px;
+  width: 320px; max-width: calc(100vw - 32px);
+  border-radius: var(--radius);
+  z-index: 300;
+  animation: notif-in .22s ease;
+  overflow: hidden;
+}
+@keyframes notif-in {
+  from { opacity: 0; transform: translateY(-10px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.notif-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--text);
+  background: var(--bg3);
+}
+.notif-list { display: flex; flex-direction: column; max-height: 360px; overflow-y: auto; }
+.notif-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+  cursor: pointer;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item.notif-new { border-left: 3px solid var(--accent); }
+.notif-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.notif-title {
+  font-size: 12.5px; font-weight: 500; color: var(--text);
+  margin-bottom: 2px; line-height: 1.4;
+}
+.notif-time {
+  font-size: 10px; color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ============================================================
+   DARK MODE TOGGLE BUTTON
+   ============================================================ */
+.theme-toggle-btn {
+  width: 34px; height: 34px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text2); font-size: 17px;
+  transition: all .2s;
+}
+.theme-toggle-btn:hover { background: var(--amber); color: #fff; border-color: var(--amber2); }
+
+/* ============================================================
+   DARK MODE PARTICLE OVERRIDE
+   ============================================================ */
+body:not(.dark-mode) #na-particles { display: none; }
+body:not(.dark-mode) .na-grid-bg   { display: none; }
+body:not(.dark-mode) .na-scan-line { display: none; }
+
+/* ============================================================
+   TAMIL FONT SUPPORT
+   ============================================================ */
+.lang-ta-text {
+  font-family: 'Noto Sans Tamil', 'Latha', 'DM Sans', sans-serif;
+}
+
